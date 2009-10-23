@@ -47,7 +47,7 @@ private:
 
         QFile file("logs/" + m_name + "-" + QByteArray::number(QCoreApplication::applicationPid()));
         if (file.open(QFile::WriteOnly | QFile::Append)) {
-            // Log tuple (size, time) as CSV
+            // Log tuple "size, time" as CSV
             file.write(QByteArray::number(m_data.size()) + ',' + QByteArray::number(time) + '\n');
             file.close();
         }
@@ -66,6 +66,7 @@ public:
 
 private:
     void compute() {
+        //TODO: Implement
     }
 };
 
@@ -77,34 +78,19 @@ public:
 
 private:
     void compute() {
+        //TODO: Implement
     }
 };
 
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-
-    // Check if the user want's to set a custom thread count
-    if (argc == 2) {
-        bool ok;
-        int threadCount = QString(argv[1]).toInt(&ok);
-        if (ok) {
-            QThreadPool::globalInstance()->setMaxThreadCount(threadCount);
-            qDebug() << "Set maximum algorithm thread pool size to" << threadCount;
-        }
-    } else if (argc >= 2) {
-        qDebug() << "Usage:" << argv[0] << "[SIZE]\n";
-        qDebug() << "    SIZE - set the maximum algorithm thread pool size (optional)";
-        return EXIT_FAILURE;
-    }
-
-    // Create a log directory (simply fails if already present)
     QDir::current().mkdir("logs/");
 
     // Iterate over test data with variying size to profile algorithms
     for (unsigned int size = 1; size < 10; size++) {
         QVector<double> data(size);
-        //TODO: Generate test data, change type for real application
+        //TODO: Generate test data, change template type
 
         QThreadPool::globalInstance()->start(new QuickSort<double>(data));
         QThreadPool::globalInstance()->start(new MergeSort<double>(data));
