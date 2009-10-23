@@ -1,7 +1,9 @@
 build/
 Makefile
 *.o
+*.moc
+*.swp
 *~
 core
 *.core
-sat
+satf
