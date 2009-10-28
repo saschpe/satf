@@ -1,68 +1,34 @@
 /*
-    Copyright 2009 Sascha Peilicke <sasch.pe@gmx.de>
+   Sort Algorithm Test Fest
+   Copyright (C) 2009 Sascha Peilicke <sasch.pe@gmx.de>
 
-    Sort Algorithm Test Fest
+   Simple framework to profile different sorting algorithms.
 
-    Simple framework to profile different sorting algorithms.
- */
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "algorithm.h"
 
 #include <QCoreApplication>
-#include <QDebug>
+#include <QDateTime>
 #include <QDir>
-#include <QFile>
-#include <QMutex>
 #include <QThreadPool>
-#include <QTime>
-#include <QVector>
 
-/**
- * Abstract (pure virtual) threaded base class for generic
- * algorithms. Provides runtime measurement and logging.
- */
-template <typename T>
-class Algorithm : public QRunnable
+class QuickSort : public Algorithm
 {
 public:
-    explicit Algorithm(const QVector<T> &data, const QString &name) : m_data(data), m_name(name) {}
-    virtual ~Algorithm() {}
-
-    virtual void run() {
-        QTime m_time;
-
-        m_time.start();
-        compute();
-        int time = m_time.elapsed();
-        qDebug() << m_name << "took" << time << "ms for" << m_data.size() << "item(s).";
-        log(time);
-    }
-
-protected:
-    virtual void compute() = 0;
-
-    QVector<T> m_data;
-
-private:
-    void log(int time) {
-        m_logMutex.lock();
-
-        QFile file("logs/" + m_name + "-" + QByteArray::number(QCoreApplication::applicationPid()));
-        if (file.open(QFile::WriteOnly | QFile::Append)) {
-            // Log tuple "size, time" as CSV
-            file.write(QByteArray::number(m_data.size()) + ',' + QByteArray::number(time) + '\n');
-            file.close();
-        }
-        m_logMutex.unlock();
-    }
-
-    QMutex m_logMutex;
-    QString m_name;
-};
-
-template <typename T>
-class QuickSort : public Algorithm<T>
-{
-public:
-    explicit QuickSort(const QVector<T> &data) : Algorithm<T>(data, "QuickSort") {}
+    QuickSort(QVariantList data) : Algorithm(data) {}
 
 private:
     void compute() {
@@ -70,11 +36,10 @@ private:
     }
 };
 
-template <typename T>
-class MergeSort : public Algorithm<T>
+class MergeSort : public Algorithm
 {
 public:
-    explicit MergeSort(const QVector<T> &data) : Algorithm<T>(data, "MergeSort") {}
+    MergeSort(QVariantList &data) : Algorithm(data) {}
 
 private:
     void compute() {
@@ -85,16 +50,22 @@ private:
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    QDir::current().mkdir("logs/");
+
+    // Create and set algorithm log path
+    QString logPath = "logs/log-" + QDateTime::currentDateTime().toString("ddMyy-hhmmss");
+    QDir::current().mkdir(logPath);
+    Algorithm::setLogPath(logPath);
+
+    QVariantList data;
 
     // Iterate over test data with variying size to profile algorithms
-    for (unsigned int size = 1; size < 10; size++) {
-        QVector<double> data(size);
-        //TODO: Generate test data, change template type
+    for (unsigned int size = 1; size < 10000; size++) {
+        // Add another random value to the test data
+        data.append(qrand());
 
-        QThreadPool::globalInstance()->start(new QuickSort<double>(data));
-        QThreadPool::globalInstance()->start(new MergeSort<double>(data));
+        QThreadPool::globalInstance()->start(new QuickSort(data));
+        QThreadPool::globalInstance()->start(new MergeSort(data));
         // Add more algorithms here if you have more
     }
-    return EXIT_SUCCESS;
+    return 0;
 }

@@ -8,4 +8,5 @@ DEPENDPATH += .
 INCLUDEPATH += .
 
 # Input
-SOURCES += src/main.cpp
+SOURCES += src/algorithm.cpp \
+           src/main.cpp
