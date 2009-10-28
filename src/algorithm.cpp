@@ -20,15 +20,20 @@
 
 #include "algorithm.h"
 
+#include <QDebug>
 #include <QTime>
 
+QString Algorithm::s_logPath = "logs/";
+
 Algorithm::Algorithm(QVariantList data)
-    : m_data(data), m_logEnabled(false)
-    , m_logFile(s_logPath + metaObject()->className())
+    : QObject(), m_data(data), m_logEnabled(false)
+    , m_logFile(s_logPath + '/' + metaObject()->className())
 {
     // Open a logfile for all instances of an algorithmn subclass
     if (m_logFile.open(QFile::WriteOnly | QFile::Append)) {
         m_logEnabled = true;
+        qDebug() << "Logging enabled for" << this->metaObject()->className();
+        m_logFile.write("size,time\n");
     }
 }
 

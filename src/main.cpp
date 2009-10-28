@@ -22,6 +22,7 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QDebug>
 #include <QDir>
 #include <QThreadPool>
 
@@ -52,20 +53,22 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
     // Create and set algorithm log path
-    QString logPath = "logs/log-" + QDateTime::currentDateTime().toString("ddMyy-hhmmss");
-    QDir::current().mkdir(logPath);
-    Algorithm::setLogPath(logPath);
+    QString logPath = "logs/log-" + QDateTime::currentDateTime().toString("yyyyMddM-hhmmss");
+    if (QDir::current().mkpath(logPath)) {
+        Algorithm::setLogPath(logPath);
 
-    QVariantList data;
+        QVariantList data;
 
-    // Iterate over test data with variying size to profile algorithms
-    for (unsigned int size = 1; size < 10000; size++) {
-        // Add another random value to the test data
-        data.append(qrand());
+        // Iterate over test data with variying size to profile algorithms
+        for (unsigned int size = 1; size < 10; size++) {
+            // Add another random value to the test data
+            data.append(qrand());
 
-        QThreadPool::globalInstance()->start(new QuickSort(data));
-        QThreadPool::globalInstance()->start(new MergeSort(data));
-        // Add more algorithms here if you have more
+            QThreadPool::globalInstance()->start(new QuickSort(data));
+            QThreadPool::globalInstance()->start(new MergeSort(data));
+            // Add more algorithms here if you have more
+        }
+        return 0;
     }
-    return 0;
+    return 1;
 }

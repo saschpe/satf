@@ -32,6 +32,8 @@
  */
 class Algorithm : public QObject, public QRunnable
 {
+    Q_OBJECT
+
 public:
     /**
      * The standard constructor takes data by-value since the original
