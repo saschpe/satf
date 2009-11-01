@@ -62,6 +62,7 @@ echo "Overall max computation time was $OVERALL_MAX_TIME millisecond"
 LAST_PLOT_DIR=`echo $PLOT_DIR/$LAST_LOG`
 mkdir -p $LAST_PLOT_DIR
 echo "Generating plots in \"$LAST_PLOT_DIR\"..."
+ALL_IN_ONE_PLOT_LINE=""
 for FILE in `ls $LAST_LOG_DIR`; do
     `gnuplot << EOF
         set xlabel "data size [number of elements]"
@@ -74,4 +75,20 @@ for FILE in `ls $LAST_LOG_DIR`; do
         plot '$LAST_LOG_DIR/$FILE' using 1:2 title "$LAST_LOG_DIR/$FILE" with lines
         quit
         EOF`
+    # Build up the input for gnuplot 'plot' command to use for the combined plot
+    ALL_IN_ONE_PLOT_LINE+=`echo -e "'$LAST_LOG_DIR/$FILE' using 1:2 title \"$LAST_LOG_DIR/$FILE\" with lines, "`
 done
+
+# Finally generate a function plot with all algorithms combined and remove the trailing ', '
+ALL_IN_ONE_PLOT_LINE=`echo ${ALL_IN_ONE_PLOT_LINE/%, /}`
+`gnuplot << EOF
+    set xlabel "data size [number of elements]"
+    set xrange [$MIN_SIZE:$MAX_SIZE]
+    set ylabel "used time [milliseconds]"
+    set yrange [0:$OVERALL_MAX_TIME]
+    set grid
+    set terminal png
+    set title "All algorithms combined"
+    set output '$LAST_PLOT_DIR/all.png'
+    plot $ALL_IN_ONE_PLOT_LINE
+    quit
