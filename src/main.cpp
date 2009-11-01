@@ -18,57 +18,25 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "algorithm.h"
+#include "mergesort.h"
+#include "quicksort.h"
 
 #include <QCoreApplication>
-#include <QDateTime>
-#include <QDebug>
-#include <QDir>
 #include <QThreadPool>
-
-class QuickSort : public Algorithm
-{
-public:
-    QuickSort(QVariantList data) : Algorithm(data) {}
-
-private:
-    void compute() {
-        //TODO: Implement
-    }
-};
-
-class MergeSort : public Algorithm
-{
-public:
-    MergeSort(QVariantList &data) : Algorithm(data) {}
-
-private:
-    void compute() {
-        //TODO: Implement
-    }
-};
 
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
+    QVariantList data;
 
-    // Create and set algorithm log path
-    QString logPath = "logs/log-" + QDateTime::currentDateTime().toString("yyyyMddM-hhmmss");
-    if (QDir::current().mkpath(logPath)) {
-        Algorithm::setLogPath(logPath);
+    // Iterate over test data with variying size to profile algorithms
+    for (unsigned int size = 1; size < 10; size++) {
+        // Add another random value to the test data
+        data.append(qrand());
 
-        QVariantList data;
-
-        // Iterate over test data with variying size to profile algorithms
-        for (unsigned int size = 1; size < 10; size++) {
-            // Add another random value to the test data
-            data.append(qrand());
-
-            QThreadPool::globalInstance()->start(new QuickSort(data));
-            QThreadPool::globalInstance()->start(new MergeSort(data));
-            // Add more algorithms here if you have more
-        }
-        return 0;
+        QThreadPool::globalInstance()->start(new QuickSort(data));
+        QThreadPool::globalInstance()->start(new MergeSort(data));
+        // Add more algorithms here if you have more
     }
-    return 1;
+    return 0;
 }

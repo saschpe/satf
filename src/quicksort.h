@@ -18,41 +18,22 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef ALGORITHM_H
-#define ALGORITHM_H
+#ifndef QUICKSORT_H
+#define QUICKSORT_H
 
-#include <QMutex>
-#include <QRunnable>
-#include <QVariant>
+#include "algorithm.h"
 
-/**
- * Abstract (pure virtual) threaded base class for generic
- * algorithms. Provides runtime measurement and logging.
- */
-class Algorithm : public QObject, public QRunnable
+class QuickSort : public Algorithm
 {
     Q_OBJECT
 
 public:
-    /**
-     * The standard constructor takes data by-value since the original
-     * content of 'data' should remain unchanged.
-     */
-    Algorithm(QVariantList data);
-    virtual ~Algorithm();
-
-protected:
-    /**
-     * Implement this method in subclasses to do the actual work.
-     */
-    virtual void compute() = 0;
-
-    QVariantList m_data;
+    QuickSort(QVariantList data) : Algorithm(data) {}
 
 private:
-    virtual void run();
-
-    QMutex m_logMutex;
+    void compute() {
+        //TODO: Implement
+    }
 };
 
 #endif
