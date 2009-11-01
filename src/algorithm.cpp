@@ -56,14 +56,14 @@ void Algorithm::run()
         }
     }
 
-    // Open the log file for appending, write the tuple "size, time"
+    // Open the log file for appending, write the tuple "size time"
     // as CSV and flush/close the file
     QFile logFile(LOG_DIR + '/' + metaObject()->className());
     if (!logFile.open(QFile::WriteOnly | QFile::Append)) {
         qWarning() << "Unable to open log file" << logFile.fileName();
         return;
     }
-    logFile.write(QByteArray::number(m_data.size()) + ',' +
+    logFile.write(QByteArray::number(m_data.size()) + ' ' +
                   QByteArray::number(time) + '\n');
     logFile.close();
 }
