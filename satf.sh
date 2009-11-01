@@ -89,6 +89,7 @@ echo "Overall max computation time was $OVERALL_MAX_TIME millisecond"
 # Generate function plots for each log file in LAST_LOG_DIR and
 # output into distinct files
 LAST_PLOT_DIR=`echo $PLOT_DIR/$LAST_LOG`
+UNAME=`uname -a`
 mkdir -p $LAST_PLOT_DIR
 echo "Generating plots in \"$LAST_PLOT_DIR\"..."
 ALL_IN_ONE_PLOT_LINE=""
@@ -100,6 +101,7 @@ for FILE in `ls $LAST_LOG_DIR`; do
         set yrange [0:$OVERALL_MAX_TIME]
         set grid
         set terminal png
+        set title "Algorithm: $FILE\n$UNAME"
         set output '$LAST_PLOT_DIR/$FILE.png'
         plot '$LAST_LOG_DIR/$FILE' using 1:2 title "$LAST_LOG_DIR/$FILE" with lines
         quit
@@ -117,7 +119,7 @@ ALL_IN_ONE_PLOT_LINE=`echo ${ALL_IN_ONE_PLOT_LINE/%, /}`
     set yrange [0:$OVERALL_MAX_TIME]
     set grid
     set terminal png
-    set title "All algorithms combined"
+    set title "All algorithms\n$UNAME"
     set output '$LAST_PLOT_DIR/all.png'
     plot $ALL_IN_ONE_PLOT_LINE
     quit
