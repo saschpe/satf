@@ -25,8 +25,9 @@
 #include <QVariant>
 
 /**
- * Abstract (pure virtual) threaded base class for generic
- * algorithms. Provides runtime measurement and logging.
+ * Abstract (pure virtual) threaded base class for generic algorithms.
+ * Provides runtime measurement and logging.The log file content is not
+ * guaranteed to be in any order.
  */
 class Algorithm : public QObject, public QRunnable
 {
