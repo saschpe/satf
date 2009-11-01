@@ -1,5 +1,5 @@
 #!/bin/sh
-# This script generates and runs the algorithm test binary
+# This script builds and runs the algorithm test binary
 # and generates function plots from the resulting log data.
 
 MIN_SIZE=1
