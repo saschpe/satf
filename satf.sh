@@ -99,14 +99,16 @@ for FILE in `ls $LAST_LOG_DIR`; do
         set ylabel "used time [milliseconds]"
         set yrange [0:$OVERALL_MAX_TIME]
         set grid
-        set terminal png
+        set pointsize 0.2
+        set key top left
+        set terminal png font "arial" 8
         set title "Algorithm: $FILE\n$UNAME"
         set output '$LAST_PLOT_DIR/$FILE.png'
-        plot '$LAST_LOG_DIR/$FILE' using 1:2 title "$LAST_LOG_DIR/$FILE" with lines
+        plot '$LAST_LOG_DIR/$FILE' using 1:2 title "$LAST_LOG_DIR/$FILE"
         quit
         EOF`
     # Build up the input for gnuplot 'plot' command to use for the combined plot
-    ALL_IN_ONE_PLOT_LINE+=`echo -e "'$LAST_LOG_DIR/$FILE' using 1:2 title \"$LAST_LOG_DIR/$FILE\" with lines, "`
+    ALL_IN_ONE_PLOT_LINE+=`echo -e "'$LAST_LOG_DIR/$FILE' using 1:2 title \"$LAST_LOG_DIR/$FILE\", "`
 done
 
 # Finally generate a function plot with all algorithms combined and remove the trailing ', '
@@ -117,7 +119,9 @@ ALL_IN_ONE_PLOT_LINE=`echo ${ALL_IN_ONE_PLOT_LINE/%, /}`
     set ylabel "used time [milliseconds]"
     set yrange [0:$OVERALL_MAX_TIME]
     set grid
-    set terminal png
+    set pointsize 0.2
+    set key top left
+    set terminal png font "arial" 8
     set title "All algorithms\n$UNAME"
     set output '$LAST_PLOT_DIR/all.png'
     plot $ALL_IN_ONE_PLOT_LINE
