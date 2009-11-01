@@ -23,6 +23,7 @@
     OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#include "bubblesort.h"
 #include "mergesort.h"
 #include "quicksort.h"
 
@@ -62,8 +63,9 @@ int main(int argc, char *argv[])
         }
 
         // Add more algorithms here if you have more
-        QThreadPool::globalInstance()->start(new QuickSort(data));
+        QThreadPool::globalInstance()->start(new BubbleSort(data));
         QThreadPool::globalInstance()->start(new MergeSort(data));
+        QThreadPool::globalInstance()->start(new QuickSort(data));
     }
     return 0;
 }

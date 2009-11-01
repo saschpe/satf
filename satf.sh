@@ -46,15 +46,14 @@ if [ $# -eq 2 ]; then
     MIN_SIZE=$1; MAX_SIZE=$2
 fi
 
-# Check if executable exists, otherwise build it
-if test ! -x $BUILD_DIR/$BINARY ; then
-    echo "Building \"$BINARY\"..."
-    mkdir $BUILD_DIR
-    cd $BUILD_DIR
-    $QMAKE ../$PROJECT
-    make
-    cd ..
-fi
+# Rebuild executable
+rm -rf $BUILD_DIR 2>/dev/null
+echo "Building \"$BINARY\"..."
+mkdir $BUILD_DIR
+cd $BUILD_DIR
+$QMAKE ../$PROJECT
+make
+cd ..
 if test ! -x $BUILD_DIR/$BINARY ; then
     echo "Unable to build \"$BINARY\"!"; exit 1
 fi
