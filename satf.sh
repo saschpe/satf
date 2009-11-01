@@ -3,10 +3,10 @@
 # and generates function plots from the resulting log data.
 
 MIN_SIZE=1
-MAX_SIZE=100000
+MAX_SIZE=1000
 QMAKE=`which qmake 2>/dev/null`
 GNUPLOT=`which gnuplot 2>/dev/null`
-SATF=./satf
+SATF=satf
 PROJECT_FILE=satf.pro
 BUILD_DIR=build
 LOG_DIR=logs
