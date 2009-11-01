@@ -7,6 +7,8 @@ MAX_SIZE=100000
 QMAKE=`which qmake 2>/dev/null`
 GNUPLOT=`which gnuplot 2>/dev/null`
 SATF=./satf
+PROJECT_FILE=satf.pro
+BUILD_DIR=build
 LOG_DIR=logs
 PLOT_DIR=plots
 
@@ -16,16 +18,21 @@ if [ $# -eq 2 ] ; then
 fi
 
 # Check if executable exists, otherwise build it
-if test ! -x $SATF ; then
-    echo "Building \"$SATF\"..."; $QMAKE && mak
+if test ! -x $BUILD_DIR/$SATF ; then
+    echo "Building \"$SATF\"..."
+    mkdir $BUILD_DIR
+    cd $BUILD_DIR
+    $QMAKE ../$PROJECT_FILE
+    make
+    cd ..
 fi
-if test ! -x $SATF ; then
+if test ! -x $BUILD_DIR/$SATF ; then
     echo "Unable to build \"$SATF\"!"; exit 1
 fi
 
 # Run executable to generate performance measurement data
 echo "Running executable \"$SATF\" to generate measurement data..."
-${SATF} ${MIN_SIZE} ${MAX_SIZE}
+build/${SATF} ${MIN_SIZE} ${MAX_SIZE}
 
 # Sort contents of files in the last generated log dir numerically.
 # Also retrieve the maximum computation time of all algorithms for
