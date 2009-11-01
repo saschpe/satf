@@ -21,7 +21,6 @@
 #ifndef ALGORITHM_H
 #define ALGORITHM_H
 
-#include <QMutex>
 #include <QRunnable>
 #include <QVariant>
 
@@ -38,7 +37,7 @@ public:
      * The standard constructor takes data by-value since the original
      * content of 'data' should remain unchanged.
      */
-    Algorithm(QVariantList data);
+    explicit Algorithm(QVariantList data);
     virtual ~Algorithm();
 
 protected:
@@ -51,8 +50,6 @@ protected:
 
 private:
     virtual void run();
-
-    QMutex m_logMutex;
 };
 
 #endif

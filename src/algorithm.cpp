@@ -23,13 +23,14 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDir>
-#include <QFile>
+#include <QMutexLocker>
 
-// Set module-private algorithm log directory path
-static const QString LOG_DIR = "logs/log-" + QDateTime::currentDateTime().toString("yyyyMMdd-hhmmss");
+// Set module-private log directory path
+static const QString LOG_DIR = "logs/" + QDateTime::currentDateTime().toString("yyyyMMdd-hhmmss");
+static QMutex g_mutex;
 
 Algorithm::Algorithm(QVariantList data)
-    : QObject(), m_data(data)
+    : m_data(data)
 {
 }
 
@@ -40,29 +41,29 @@ Algorithm::~Algorithm()
 void Algorithm::run()
 {
     QTime m_time;
-
     m_time.start();
     compute();
     int time = m_time.elapsed();
 
-    // Check if log directory exists or create it. Furthermore
-    // open the log file for appending.
-    m_logMutex.lock();
-    if (!QDir(LOG_DIR).exists() && !QDir::current().mkpath(LOG_DIR)) {
-        m_logMutex.unlock();
-        qDebug() << "Unable to create log directory" << LOG_DIR;
-        return;
-    }
-    QFile logFile(LOG_DIR + '/' + metaObject()->className());
-    if (!logFile.open(QFile::WriteOnly | QFile::Append)) {
-        m_logMutex.unlock();
-        qDebug() << "Unable to open log file" << logFile.fileName();
-        return;
+    // Check if log directory exists and create it accordingly.
+    QMutexLocker locker(&g_mutex);
+    if (!QDir(LOG_DIR).exists()) {
+        if (!QDir::current().mkpath(LOG_DIR)) {
+            qWarning() << "Unable to create log directory" << LOG_DIR;
+            return;
+        } else {
+            qDebug() << "Created log directory" << LOG_DIR;
+        }
     }
 
-    // Finally log tuple "size, time" as CSV and flush/close the file
+    // Open the log file for appending, write the tuple "size, time"
+    // as CSV and flush/close the file
+    QFile logFile(LOG_DIR + '/' + metaObject()->className());
+    if (!logFile.open(QFile::WriteOnly | QFile::Append)) {
+        qWarning() << "Unable to open log file" << logFile.fileName();
+        return;
+    }
     logFile.write(QByteArray::number(m_data.size()) + ',' +
                   QByteArray::number(time) + '\n');
     logFile.close();
-    m_logMutex.unlock();
 }

@@ -22,21 +22,40 @@
 #include "quicksort.h"
 
 #include <QCoreApplication>
+#include <QDebug>
 #include <QThreadPool>
 
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
     QVariantList data;
+    unsigned int min_size = 1, max_size = 1000;
 
-    // Iterate over test data with variying size to profile algorithms
-    for (unsigned int size = 1; size < 10; size++) {
+    // Check for commandline arguments
+    if (argc == 2) {
+        max_size = QString(argv[1]).toUInt();
+    } else if (argc == 3) {
+        min_size = QString(argv[1]).toUInt();
+        max_size = QString(argv[2]).toUInt();
+    } else {
+        qDebug() << "Hint: You can provide a custom test data size range:\n\n"
+                 << "    " << argv[0] << "[[MIN_SIZE] MAX_SIZE]\n";
+    }
+
+    qDebug() << "Using" << QThreadPool::globalInstance()->maxThreadCount()
+             << "threads with a test data size range from" << min_size
+             << "to" << max_size;
+
+    // Iterate over test data with varying size to profile algorithms
+    // under changing conditions. 'data' is passed by-value and thus
+    // remains unchanged for easy reuse.
+    for (; min_size <= max_size; min_size++) {
         // Add another random value to the test data
         data.append(qrand());
 
+        // Add more algorithms here if you have more
         QThreadPool::globalInstance()->start(new QuickSort(data));
         QThreadPool::globalInstance()->start(new MergeSort(data));
-        // Add more algorithms here if you have more
     }
     return 0;
 }
