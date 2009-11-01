@@ -27,7 +27,7 @@
 /**
  * Abstract (pure virtual) threaded base class for generic algorithms.
  * Provides runtime measurement and logging.The log file content is not
- * guaranteed to be in any order.
+ * guaranteed to be in sort order.
  */
 class Algorithm : public QObject, public QRunnable
 {
