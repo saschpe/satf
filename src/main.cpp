@@ -49,9 +49,12 @@ int main(int argc, char *argv[])
     // Iterate over test data with varying size to profile algorithms
     // under changing conditions. 'data' is passed by-value and thus
     // remains unchanged for easy reuse.
-    for (; min_size <= max_size; min_size++) {
+    for (unsigned int i = 1; i <= max_size; i++) {
         // Add another random value to the test data
         data.append(qrand());
+        if (i < min_size) {
+            continue;
+        }
 
         // Add more algorithms here if you have more
         QThreadPool::globalInstance()->start(new QuickSort(data));
