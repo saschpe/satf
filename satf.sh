@@ -13,8 +13,12 @@ LOG_DIR=logs
 PLOT_DIR=plots
 
 # Check for optional commandline arguments
-if [ $# -eq 2 ] ; then
-    MIN_SIZE=$1 ; MAX_SIZE=$2
+if [ $# -eq 1 ] && [ $1 = "clean" ]; then
+    rm -rf $BUILD_DIR $LOG_DIR $PLOT_DIR
+    exit 0
+fi
+if [ $# -eq 2 ]; then
+    MIN_SIZE=$1; MAX_SIZE=$2
 fi
 
 # Check if executable exists, otherwise build it
@@ -92,3 +96,4 @@ ALL_IN_ONE_PLOT_LINE=`echo ${ALL_IN_ONE_PLOT_LINE/%, /}`
     set output '$LAST_PLOT_DIR/all.png'
     plot $ALL_IN_ONE_PLOT_LINE
     quit
+    EOF`
