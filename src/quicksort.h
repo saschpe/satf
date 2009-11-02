@@ -30,10 +30,8 @@
 
 class QuickSort : public Algorithm
 {
-    Q_OBJECT
-
 public:
-    QuickSort(QVariantList data) : Algorithm(data) {}
+    QuickSort(QVariantList data) : Algorithm(data, "QuickSort") {}
 
 private:
     void compute() {

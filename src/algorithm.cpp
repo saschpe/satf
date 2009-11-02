@@ -34,8 +34,8 @@
 static const QString LOG_DIR = "logs/" + QDateTime::currentDateTime().toString("yyyyMMdd-hhmmss");
 static QMutex g_mutex;
 
-Algorithm::Algorithm(QVariantList data)
-    : m_data(data)
+Algorithm::Algorithm(QVariantList data, const char *name)
+    : m_data(data), m_name(name)
 {
 }
 
@@ -63,7 +63,7 @@ void Algorithm::run()
 
     // Open the log file for appending, write the tuple "size time"
     // as CSV and flush/close the file
-    QFile logFile(LOG_DIR + '/' + metaObject()->className());
+    QFile logFile(LOG_DIR + '/' + m_name);
     if (!logFile.open(QFile::WriteOnly | QFile::Append)) {
         qWarning() << "Unable to open log file" << logFile.fileName();
         return;

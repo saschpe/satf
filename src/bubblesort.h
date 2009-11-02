@@ -30,10 +30,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 class BubbleSort : public Algorithm
 {
-    Q_OBJECT
-
 public:
-    BubbleSort(QVariantList data) : Algorithm(data) {}
+    BubbleSort(QVariantList data) : Algorithm(data, "BubbleSort") {}
 
 private:
     void compute() {

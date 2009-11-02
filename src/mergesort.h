@@ -30,10 +30,8 @@
 
 class MergeSort : public Algorithm
 {
-    Q_OBJECT
-
 public:
-    MergeSort(QVariantList &data) : Algorithm(data) {}
+    MergeSort(QVariantList &data) : Algorithm(data, "MergeSort") {}
 
 private:
     void compute() {

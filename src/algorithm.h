@@ -34,16 +34,14 @@
  * Provides runtime measurement and logging.The log file content is not
  * guaranteed to be in sort order.
  */
-class Algorithm : public QObject, public QRunnable
+class Algorithm : public QRunnable
 {
-    Q_OBJECT
-
 public:
     /**
      * The standard constructor takes data by-value since the original
      * content of 'data' should remain unchanged.
      */
-    explicit Algorithm(QVariantList data);
+    Algorithm(QVariantList data, const char *name);
     virtual ~Algorithm();
 
 protected:
@@ -56,6 +54,8 @@ protected:
 
 private:
     virtual void run();
+
+    const QLatin1String m_name;
 };
 
 #endif
