@@ -20,10 +20,6 @@
 #ifndef QUICKSORT_H
 #define QUICKSORT_H
 
-#include <algorithm>
-#include <functional>
-#include <iterator>
-
 template <class RandomAccessIterator, class Less>
 void quick_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
 {
