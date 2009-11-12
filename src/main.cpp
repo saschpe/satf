@@ -79,7 +79,9 @@ void measure_merge_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     merge_sort(tmp.begin(), tmp.end(), std::less<T>());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+
     log(data_traits, "merge_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "merge_sort " + data_traits + ' ');
 }
 
 template <typename T>
@@ -103,7 +105,9 @@ void measure_std_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::sort(tmp.begin(), tmp.end());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+
     log(data_traits, "std_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "std_sort " + data_traits + ' ');
 }
 
 int main(int argc, char *argv[])
@@ -118,7 +122,7 @@ int main(int argc, char *argv[])
         ("max", program_options::value<unsigned int>(&max_size)->default_value(1000), "set maximum data size")
         ("theads", program_options::value<unsigned int>(&thread_count)->default_value(thread::hardware_concurrency()), "set worker thead count")
         ("verbose", "display extra runtime output")
-        ("help", "displays this help and exit");
+        ("help", "display this help and exit");
     program_options::variables_map vm;
     program_options::store(program_options::parse_command_line(argc, argv, desc), vm);
     program_options::notify(vm);
