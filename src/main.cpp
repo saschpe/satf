@@ -22,6 +22,9 @@
 #include "quicksort.h"
 
 #include <boost/bind.hpp>
+#include <boost/date_time.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
 #include <boost/thread.hpp>
@@ -31,44 +34,51 @@
 #include <iostream>
 #include <vector>
 
+using namespace boost;
 using namespace std;
 
-template <typename T>
-bool less_than(T x, T y)
+static filesystem::path g_log_dir;
+static mutex g_log_mutex;
+
+void log(const string &data_traits, const string &name, int size, double time)
 {
-    return x < y;
+    lock_guard<mutex> lock(g_log_mutex);
+    filesystem::path specific_log_dir = filesystem::complete(data_traits, g_log_dir);
+
+    if (!filesystem::create_directory(specific_log_dir)) {
+        return;
+    }
+
+    filesystem::path log_file = filesystem::complete(name, specific_log_dir);
+    filesystem::ofstream ofs(log_file);
+    ofs << size << ' ' << time << endl;
 }
 
-void log(const string &type, const string &name, int size, double time)
-{
-    // TODO: log stuff to file
-}
-
 template <typename T>
-void measure_merge_sort(const string &type, vector<T> data)
+void measure_merge_sort(const string &data_traits, vector<T> data)
 {
-    boost::timer timer;
-    merge_sort(data.begin(), data.end(), less_than<T>);
+    timer timer;
+    merge_sort(data.begin(), data.end(), std::less<T>());
     double elapsed = timer.elapsed();
-    log(type, "merge_sort", data.size(), elapsed);
+    log(data_traits, "merge_sort", data.size(), elapsed);
 }
 
 template <typename T>
-void measure_quick_sort(const string &type, vector<T> data)
+void measure_quick_sort(const string &data_traits, vector<T> data)
 {
-    boost::timer timer;
-    quick_sort(data.begin(), data.end(), less_than<T>);
+    timer timer;
+    quick_sort(data.begin(), data.end(), std::less<T>());
     double elapsed = timer.elapsed();
-    log(type, "quick_sort", data.size(), elapsed);
+    log(data_traits, "quick_sort", data.size(), elapsed);
 }
 
 template <typename T>
-void measure_std_sort(const string &type, vector<T> data)
+void measure_std_sort(const string &data_traits, vector<T> data)
 {
-    boost::timer timer;
+    timer timer;
     std::sort(data.begin(), data.end());
     double elapsed = timer.elapsed();
-    log(type, "std_sort", data.size(), elapsed);
+    log(data_traits, "std_sort", data.size(), elapsed);
 }
 
 int main(int argc, char *argv[])
@@ -78,49 +88,63 @@ int main(int argc, char *argv[])
     // Handle command line arguments
     if (argc == 2) {
         try {
-            max_size = boost::lexical_cast<unsigned int>(argv[1]);
-        } catch (boost::bad_lexical_cast &) {
-            cout << "Bad commandline argument(s) provided!" << endl;
+            max_size = lexical_cast<unsigned int>(argv[1]);
+        } catch (bad_lexical_cast &) {
+            cerr << "Bad commandline argument(s) provided!" << endl;
+            return 1;
         }
     } else if (argc == 3) {
         try {
-            min_size = boost::lexical_cast<unsigned int>(argv[1]);
-            max_size = boost::lexical_cast<unsigned int>(argv[2]);
-        } catch (boost::bad_lexical_cast &) {
-            cout << "Bad commandline argument(s) provided!" << endl;
+            min_size = lexical_cast<unsigned int>(argv[1]);
+            max_size = lexical_cast<unsigned int>(argv[2]);
+        } catch (bad_lexical_cast &) {
+            cerr << "Bad commandline argument(s) provided!" << endl;
+            return 1;
         }
     } else {
         cout << "Hint: You can provide a custom test data size range:\n\n"
-                  << "    " << argv[0] << "[[MIN_SIZE] MAX_SIZE]" << endl;
+             << "    " << argv[0] << " [[MIN_SIZE] MAX_SIZE]\n" << endl;
     }
-    cout << "Using" << boost::thread::hardware_concurrency()
-              << "threads with a test data size range from" << min_size
-              << "to" << max_size << endl;
+    cout << "Using " << thread::hardware_concurrency()
+         << " threads with a test data size range from " << min_size
+         << " to " << max_size << endl;
+
+    // Create current log directory path
+    g_log_dir = filesystem::complete("logs/", filesystem::current_path());
+    filesystem::create_directory(g_log_dir);
+    g_log_dir = filesystem::complete(lexical_cast<string>(getpid()) + '/', g_log_dir);
+    filesystem::create_directory(g_log_dir);
+    if (!filesystem::exists(g_log_dir)) {
+        cerr << "Unable to create log directory " << g_log_dir << endl;
+        return 1;
+    } else {
+        cout << "Created log directory " << g_log_dir << endl;
+    }
 
     // Build a random number generator
-    boost::mt19937 rng;
-    boost::uniform_int<> dist(min_size, max_size);
-    boost::variate_generator<boost::mt19937&, boost::uniform_int<> > dice(rng, dist);
+    mt19937 rng;
+    uniform_int<> dist(min_size, max_size);
+    variate_generator<mt19937&, uniform_int<> > dice(rng, dist);
 
     // Create our threadpool
-    boost::threadpool::pool tp(boost::thread::hardware_concurrency());
+    threadpool::pool tp(thread::hardware_concurrency());
 
     cout << "Measure performance for random data..." << endl;
     vector<int> data;
     for (unsigned int i = min_size; i <= max_size; i++) {
         data.push_back(dice());
-        tp.schedule(boost::bind(measure_merge_sort<int>, "random", data));
-        tp.schedule(boost::bind(measure_quick_sort<int>, "random", data));
-        tp.schedule(boost::bind(measure_std_sort<int>, "random",  data));
+        tp.schedule(bind(measure_merge_sort<int>, "random", data));
+        tp.schedule(bind(measure_quick_sort<int>, "random", data));
+        tp.schedule(bind(measure_std_sort<int>, "random",  data));
     }
 
-    cout << "Measure performance for already sorted data..." << endl;
+    cout << "Measure performance for sorted data..." << endl;
     data.clear();
     for (unsigned int i = min_size; i <= max_size; i++) {
         data.push_back(i);
-        tp.schedule(boost::bind(measure_merge_sort<int>, "sorted", data));
-        tp.schedule(boost::bind(measure_quick_sort<int>, "random", data));
-        tp.schedule(boost::bind(measure_std_sort<int>, "sorted", data));
+        tp.schedule(bind(measure_merge_sort<int>, "sorted", data));
+        tp.schedule(bind(measure_quick_sort<int>, "sorted", data));
+        tp.schedule(bind(measure_std_sort<int>, "sorted", data));
     }
     return 0;
 }

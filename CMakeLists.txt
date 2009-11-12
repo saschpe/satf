@@ -3,7 +3,7 @@ project(sbslab)
 
 set(CMAKE_MODULE_PATH "${sbslab_SOURCE_DIR}/cmake/modules")
 
-find_package(Boost 1.38 COMPONENTS thread REQUIRED)
+find_package(Boost 1.38 COMPONENTS date_time filesystem thread REQUIRED)
 
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
