@@ -25,35 +25,47 @@
 
 #include "mergesort.h"
 #include "quicksort.h"
-//#include "sortrunner.h"
+#include "boost/threadpool.hpp"
 
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
-#include <boost/algorithm/string.hpp>
 #include <boost/thread.hpp>
-#include "boost/threadpool.hpp"
+#include <boost/timer.hpp>
 
-#include <algorithm>    // for std::sort()
-#include <vector>
+#include <algorithm>    // for sort()
 #include <iostream>
+#include <vector>
+
+using namespace std;
 
 template <typename T>
-bool less(T x, T y)
+bool less_than(T x, T y)
 {
     return x < y;
 }
 
-template <typename T>
-void std_sort_thread(std::vector<T> data)
+void log(const string &type, const string &name, int size, double time)
 {
-    std::sort(data.begin(), data.end());
+    // TODO: log stuff to file
 }
 
 template <typename T>
-void merge_sort_thread(std::vector<T> data)
+void measure_std_sort(const string &type, vector<T> data)
 {
-    merge_sort(data.begin(), data.end(), less);
+    boost::timer timer;
+    sort(data.begin(), data.end());
+    double elapsed = timer.elapsed();
+    log(type, "std_sort", data.size(), elapsed);
+}
+
+template <typename T>
+void measure_merge_sort(const string &type, vector<T> data)
+{
+    boost::timer timer;
+    merge_sort(data.begin(), data.end(), less_than<T>);
+    double elapsed = timer.elapsed();
+    log(type, "merge_sort", data.size(), elapsed);
 }
 
 int main(int argc, char *argv[])
@@ -65,22 +77,22 @@ int main(int argc, char *argv[])
         try {
             max_size = boost::lexical_cast<unsigned int>(argv[1]);
         } catch (boost::bad_lexical_cast &) {
-            std::cout << "Bad commandline argument(s) provided!" << std::endl;
+            cout << "Bad commandline argument(s) provided!" << endl;
         }
     } else if (argc == 3) {
         try {
             min_size = boost::lexical_cast<unsigned int>(argv[1]);
             max_size = boost::lexical_cast<unsigned int>(argv[2]);
         } catch (boost::bad_lexical_cast &) {
-            std::cout << "Bad commandline argument(s) provided!" << std::endl;
+            cout << "Bad commandline argument(s) provided!" << endl;
         }
     } else {
-        std::cout << "Hint: You can provide a custom test data size range:\n\n"
-                  << "    " << argv[0] << "[[MIN_SIZE] MAX_SIZE]" << std::endl;
+        cout << "Hint: You can provide a custom test data size range:\n\n"
+                  << "    " << argv[0] << "[[MIN_SIZE] MAX_SIZE]" << endl;
     }
-    std::cout << "Using" << boost::thread::hardware_concurrency()
+    cout << "Using" << boost::thread::hardware_concurrency()
               << "threads with a test data size range from" << min_size
-              << "to" << max_size << std::endl;
+              << "to" << max_size << endl;
 
     // Build a random number generator
     boost::mt19937 rng;
@@ -90,12 +102,20 @@ int main(int argc, char *argv[])
     // Create our threadpool
     boost::threadpool::pool tp(boost::thread::hardware_concurrency());
 
-    std::cout << "Measuring performance for random data..." << std::endl;
-    std::vector<int> randomData;
+    cout << "Measure performance for random data..." << endl;
+    vector<int> data;
     for (unsigned int i = min_size; i <= max_size; i++) {
-        randomData.push_back(dice());
+        data.push_back(dice());
+        tp.schedule(boost::bind(measure_std_sort<int>, "random",  data));
+        tp.schedule(boost::bind(measure_merge_sort<int>, "random", data));
+    }
 
-        tp.schedule(boost::bind(std_sort_thread<int>, randomData));
+    cout << "Measure performance for already sorted data..." << endl;
+    data.clear();
+    for (unsigned int i = min_size; i <= max_size; i++) {
+        data.push_back(i);
+        tp.schedule(boost::bind(measure_std_sort<int>, "sorted", data));
+        tp.schedule(boost::bind(measure_merge_sort<int>, "sorted", data));
     }
     return 0;
 }
