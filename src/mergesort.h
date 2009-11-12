@@ -23,7 +23,15 @@
 template <class RandomAccessIterator, class Less>
 void merge_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
 {
-
+    /*RandomAccessIterator m = first++;
+    RandomAccessIterator i = first;
+    for (; m <= beyond(); m *= 2) {
+        for (;i < beyond() - m; i += m * 2) {
+            std::inplace_merge(first + i,
+                               first + i + m,
+                               first + std::min<RandomAccessIterator>(i + m * 2, beyond));
+        }
+    }*/
 }
 
 template <class InputIterator, class OutputIterator, class Less>
