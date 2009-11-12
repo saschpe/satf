@@ -12,7 +12,7 @@ This little 'framework' allows to perform runtime measurement of spatial sort al
 INSTALLATION
 ------------
 
-You need to have Boost and CMake installed to build the application as well as Gnuplot to execute the shell script successfully. The code is documented where necessary and should be easy to adopt to your own needs. Simply run 'generate_plots.sh' or peek inside for more detail.
+You need to have Boost and CMake installed to build the application as well as Gnuplot to execute the shell script successfully. The code is documented where necessary and should be easy to adopt to your own needs.
 
 Use to following steps to build the application:
 
@@ -20,6 +20,8 @@ Use to following steps to build the application:
  $ cd build/
  $ cmake ..
  $ make
+
+Or simply run 'satf.sh' or peek inside for more detail.
 
 
 LICENSE
