@@ -3,7 +3,7 @@ project(satf)
 
 set(CMAKE_BUILD_TYPE Release)
 
-find_package(Boost 1.38 COMPONENTS date_time filesystem thread REQUIRED)
+find_package(Boost 1.38 COMPONENTS date_time filesystem program_options thread REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
 add_executable(satf src/main.cpp)

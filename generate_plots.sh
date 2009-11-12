@@ -49,7 +49,7 @@ fi
 
 # Run executable to generate performance measurement data
 echo "Running executable \"$BINARY\" to generate measurement data..."
-build/${BINARY} ${MIN_SIZE} ${MAX_SIZE}
+build/${BINARY} --min=${MIN_SIZE} --max=${MAX_SIZE}
 
 # Sort contents of files in the last generated log dir numerically.
 # Also retrieve the maximum computation time of all algorithms for

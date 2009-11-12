@@ -20,10 +20,18 @@
 #ifndef QUICKSORT_H
 #define QUICKSORT_H
 
+#include <algorithm>
+#include <functional>
+#include <iterator>
+
 template <class RandomAccessIterator, class Less>
 void quick_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
 {
-
+    if (first != beyond) {
+        RandomAccessIterator middle = std::partition(first, beyond, std::bind2nd(less, *first));
+        quick_sort(first, middle, less);
+        quick_sort(std::max(first + 1, middle), beyond, less);
+    }
 }
 
 template <class InputIterator, class OutputIterator, class Less>

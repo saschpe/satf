@@ -26,6 +26,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/program_options.hpp>
 #include <boost/random.hpp>
 #include <boost/thread.hpp>
 
@@ -37,11 +38,13 @@ using namespace boost;
 using namespace std;
 
 static filesystem::path g_log_dir;
-static mutex g_log_mutex;
+static bool g_verbose = false;
 
 void log(const string &data_traits, const string &name, int size, unsigned int time_msecs)
 {
-    lock_guard<mutex> lock(g_log_mutex);
+    static mutex log_mutex;
+
+    lock_guard<mutex> lock(log_mutex);
     filesystem::path log_dir = filesystem::complete(data_traits, g_log_dir);
     filesystem::path log_file = filesystem::complete(name, log_dir);
     filesystem::create_directory(log_dir);
@@ -50,59 +53,88 @@ void log(const string &data_traits, const string &name, int size, unsigned int t
 }
 
 template <typename T>
-void measure_merge_sort(const string &data_traits, vector<T> data)
+void print(const vector<T> &before, const vector<T> &after, const string &line_prefix = "")
 {
-    posix_time::ptime start = posix_time::microsec_clock::local_time();
-    merge_sort(data.begin(), data.end(), std::less<T>());
-    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "merge_sort", data.size(), td.total_microseconds());
+    static mutex print_mutex;
+
+    lock_guard<mutex> lock(print_mutex);
+    if (g_verbose) {
+        cout << line_prefix << "[";
+        for (unsigned int i = 0; i < before.size(); i++) {
+            cout << before[i] << ((i == before.size() - 1) ? "" : ", ");
+        }
+        cout << "] --> [";
+        for (unsigned int i = 0; i < after.size(); i++) {
+            cout << after[i] << ((i == after.size() - 1) ? "" : ", ");
+        }
+        cout << "]" << endl;
+    }
 }
 
 template <typename T>
-void measure_quick_sort(const string &data_traits, vector<T> data)
+void measure_merge_sort(const vector<T> &data, const string &data_traits = "")
 {
+    vector<T> tmp = data;   // work on a copy to not destroy original content
+
     posix_time::ptime start = posix_time::microsec_clock::local_time();
-    quick_sort(data.begin(), data.end(), std::less<T>());
+    merge_sort(tmp.begin(), tmp.end(), std::less<T>());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "quick_sort", data.size(), td.total_microseconds());
+    log(data_traits, "merge_sort", tmp.size(), td.total_microseconds());
 }
 
 template <typename T>
-void measure_std_sort(const string &data_traits, vector<T> data)
+void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
 {
+    vector<T> tmp = data;   // work on a copy to not destroy original content
+
     posix_time::ptime start = posix_time::microsec_clock::local_time();
-    std::sort(data.begin(), data.end());
+    quick_sort(tmp.begin(), tmp.end(), std::less<T>());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "std_sort", data.size(), td.total_microseconds());
+
+    log(data_traits, "quick_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "quick_sort " + data_traits + ' ');
+}
+
+template <typename T>
+void measure_std_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // work on a copy to not destroy original content
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    std::sort(tmp.begin(), tmp.end());
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+    log(data_traits, "std_sort", tmp.size(), td.total_microseconds());
 }
 
 int main(int argc, char *argv[])
 {
-    unsigned int min_size = 1, max_size = 1000;
+    unsigned int min_size, max_size;
+    unsigned int thread_count;
 
     // Handle command line arguments
-    if (argc == 2) {
-        try {
-            max_size = lexical_cast<unsigned int>(argv[1]);
-        } catch (bad_lexical_cast &) {
-            cerr << "Bad commandline argument(s) provided!" << endl;
-            return 1;
-        }
-    } else if (argc == 3) {
-        try {
-            min_size = lexical_cast<unsigned int>(argv[1]);
-            max_size = lexical_cast<unsigned int>(argv[2]);
-        } catch (bad_lexical_cast &) {
-            cerr << "Bad commandline argument(s) provided!" << endl;
-            return 1;
-        }
-    } else {
-        cout << "Hint: You can provide a custom test data size range:\n\n"
-             << "    " << argv[0] << " [[MIN_SIZE] MAX_SIZE]\n" << endl;
+    program_options::options_description desc("Allowed options");
+    desc.add_options()
+        ("min", program_options::value<unsigned int>(&min_size)->default_value(1), "set minimum data size")
+        ("max", program_options::value<unsigned int>(&max_size)->default_value(1000), "set maximum data size")
+        ("theads", program_options::value<unsigned int>(&thread_count)->default_value(thread::hardware_concurrency()), "set worker thead count")
+        ("verbose", "display extra runtime output")
+        ("help", "displays this help and exit");
+    program_options::variables_map vm;
+    program_options::store(program_options::parse_command_line(argc, argv, desc), vm);
+    program_options::notify(vm);
+
+    if (vm.count("help")) {
+        cout << "Usage: " << argv[0] << " [OPTIONS]..." << endl << desc << endl;
+        return 1;
     }
-    cout << "Using " << thread::hardware_concurrency()
-         << " threads with a test data size range from " << min_size
-         << " to " << max_size << endl;
+    if (min_size > max_size) {
+        cerr << "error: invalid minimum data size!" << endl;
+        return 1;
+    }
+    if (vm.count("verbose")) {
+        g_verbose = true;
+    }
+    cout << "using " << thread_count << " threads and a data size range from " << min_size << " to " << max_size << endl;
 
     // Create current log directory path
     g_log_dir = filesystem::complete("logs/", filesystem::current_path());
@@ -112,10 +144,10 @@ int main(int argc, char *argv[])
     g_log_dir = filesystem::complete(now, g_log_dir);
     filesystem::create_directory(g_log_dir);
     if (!filesystem::exists(g_log_dir)) {
-        cerr << "Unable to create log directory " << g_log_dir << endl;
+        cerr << "unable to create log directory " << g_log_dir << endl;
         return 1;
     } else {
-        cout << "Created log directory " << g_log_dir << endl;
+        cout << "created log directory " << g_log_dir << endl;
     }
 
     // Build a nice random number generator
@@ -124,57 +156,58 @@ int main(int argc, char *argv[])
     variate_generator<mt19937&, uniform_int<> > dice(rng, dist);
 
     // Create our threadpool
-    threadpool::pool tp(thread::hardware_concurrency());
+    threadpool::pool tp(thread_count);
 
-    cout << "Measure performance for random data..." << endl;
+    cout << "measure random data..." << endl;
     vector<int> data;
     for (unsigned int i = 1; i <= max_size; i++) {
         data.push_back(dice());
         if (i < min_size) {
             continue;
         }
-        tp.schedule(bind(measure_merge_sort<int>, "random", data));
-        tp.schedule(bind(measure_quick_sort<int>, "random", data));
-        tp.schedule(bind(measure_std_sort<int>, "random",  data));
+        tp.schedule(bind(measure_merge_sort<int>, data, "random"));
+        tp.schedule(bind(measure_quick_sort<int>, data, "random"));
+        tp.schedule(bind(measure_std_sort<int>, data, "random"));
     }
 
-    cout << "Measure performance for already sorted data..." << endl;
+    cout << "measure already sorted data..." << endl;
     data.clear();
     for (unsigned int i = 1; i <= max_size; i++) {
         data.push_back(i);
         if (i < min_size) {
             continue;
         }
-        tp.schedule(bind(measure_merge_sort<int>, "sorted", data));
-        tp.schedule(bind(measure_quick_sort<int>, "sorted", data));
-        tp.schedule(bind(measure_std_sort<int>, "sorted", data));
+        tp.schedule(bind(measure_merge_sort<int>, data, "sorted"));
+        tp.schedule(bind(measure_quick_sort<int>, data, "sorted"));
+        tp.schedule(bind(measure_std_sort<int>, data, "sorted"));
     }
 
-    cout << "Measure performance for already reverse sorted data..." << endl;
+    cout << "measure already reverse sorted data..." << endl;
     data.clear();
     for (unsigned int i = 1; i <= max_size; i++) {
         data.push_back(max_size - i);
         if (i < min_size) {
             continue;
         }
-        tp.schedule(bind(measure_merge_sort<int>, "reversed", data));
-        tp.schedule(bind(measure_quick_sort<int>, "reversed", data));
-        tp.schedule(bind(measure_std_sort<int>, "reversed", data));
+        tp.schedule(bind(measure_merge_sort<int>, data, "reversed"));
+        tp.schedule(bind(measure_quick_sort<int>, data, "reversed"));
+        tp.schedule(bind(measure_std_sort<int>, data, "reversed"));
     }
 
-    cout << "Measure performance for partially sorted data..." << endl;
+    cout << "measure partially (50%) sorted data..." << endl;
     data.clear();
     for (unsigned int i = 1; i <= max_size; i++) {
         data.push_back(i);
-        if (i % 4 != 0) {
-            sort(data.begin(), data.end());     // Results in 75% sorted data
+        if (i / (float)max_size == 0.5) {
+            // Results in 50% sorted data, not really 'partial' but does the trick
+            sort(data.begin(), data.end());
         }
         if (i < min_size) {
             continue;
         }
-        tp.schedule(bind(measure_merge_sort<int>, "partial", data));
-        tp.schedule(bind(measure_quick_sort<int>, "partial", data));
-        tp.schedule(bind(measure_std_sort<int>, "partial", data));
+        tp.schedule(bind(measure_merge_sort<int>, data, "partial"));
+        tp.schedule(bind(measure_quick_sort<int>, data, "partial"));
+        tp.schedule(bind(measure_std_sort<int>, data, "partial"));
     }
     return 0;
 }
