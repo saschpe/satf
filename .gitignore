@@ -1,9 +1,13 @@
 build/
 logs/
 plots/
+old/
 Makefile
 *.o
 moc_*
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
 *.swp
 *~
 core
