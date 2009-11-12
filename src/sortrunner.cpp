@@ -23,19 +23,6 @@
     OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef MERGESORT_H
-#define MERGESORT_H
+#include "sortrunner.h"
 
-template <class RandomAccessIterator, class Less>
-void merge_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
-{
-
-}
-
-template <class InputIterator, class OutputIterator, class Less>
-OutputIterator merge_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less )
-{
-
-}
-
-#endif
+QMutex g_mutex;

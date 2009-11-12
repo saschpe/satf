@@ -26,17 +26,16 @@
 #ifndef QUICKSORT_H
 #define QUICKSORT_H
 
-#include "algorithm.h"
-
-class QuickSort : public Algorithm
+template <class RandomAccessIterator, class Less>
+void quick_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
 {
-public:
-    QuickSort(QVariantList data) : Algorithm(data, "QuickSort") {}
 
-private:
-    void compute() {
-        //TODO: Implement
-    }
-};
+}
+
+template <class InputIterator, class OutputIterator, class Less>
+OutputIterator quick_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less )
+{
+
+}
 
 #endif
