@@ -1,13 +1,19 @@
 Simple Algorithm Test Fest
 ==========================
- 
+
 This little 'framework' allows to perform runtime measurement of generic algorithms. This is done in a nice, threaded manner. Results are logged per execution run and per algorithm for easy post-processing of the results. The provided shell script also generates nice function plots from the results for simple runtime comparison of the implemented algorithms.
-  
-You need to have Qt installed to build the application and Gnuplot to execute the shell script successfully. The code is documented where necessary and should be easy to adopt to your own needs. Simply run 'satf.sh' or peek inside for more details!
-   
-    
+
+You need to have Boost and CMake installed to build the application as well as Gnuplot to execute the shell script successfully. The code is documented where necessary and should be easy to adopt to your own needs. Simply run 'satf.sh' or peek inside for more details!
+
+
+LICENSE
+-------
+
+All source files except those found under 'src/boost' are licensed under the terms of the GNU General Public License (version 2 or later). The source files found under src/boost have their own respective license.
+
+
 TODO
 ----
-     
+
  - Add memory profiling ((m|re)alloc/free counts, etc.). Needs a proper instrumentation tool or library
  - Actually implement algorithms instead of stubs
