@@ -28,7 +28,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/random.hpp>
 #include <boost/thread.hpp>
-#include <boost/timer.hpp>
 
 #include <algorithm>    // for sort()
 #include <iostream>
@@ -40,45 +39,46 @@ using namespace std;
 static filesystem::path g_log_dir;
 static mutex g_log_mutex;
 
-void log(const string &data_traits, const string &name, int size, double time)
+void log(const string &data_traits, const string &name, int size, unsigned int time_msecs)
 {
     lock_guard<mutex> lock(g_log_mutex);
-    filesystem::path specific_log_dir = filesystem::complete(data_traits, g_log_dir);
 
-    if (!filesystem::create_directory(specific_log_dir)) {
-        return;
-    }
+    filesystem::path log_dir = filesystem::complete(data_traits, g_log_dir);
+    filesystem::path log_file = filesystem::complete(name, log_dir);
 
-    filesystem::path log_file = filesystem::complete(name, specific_log_dir);
-    filesystem::ofstream ofs(log_file);
-    ofs << size << ' ' << time << endl;
+    filesystem::create_directory(log_dir);
+    filesystem::ofstream ofs(log_file, ios_base::app | ios_base::out);
+    ofs << size << ' ' << time_msecs << endl;
 }
 
 template <typename T>
 void measure_merge_sort(const string &data_traits, vector<T> data)
 {
-    timer timer;
+    posix_time::ptime start = posix_time::microsec_clock::universal_time();
     merge_sort(data.begin(), data.end(), std::less<T>());
-    double elapsed = timer.elapsed();
-    log(data_traits, "merge_sort", data.size(), elapsed);
+    posix_time::time_duration td = posix_time::microsec_clock::universal_time() - start;
+
+    log(data_traits, "merge_sort", data.size(), td.total_microseconds());
 }
 
 template <typename T>
 void measure_quick_sort(const string &data_traits, vector<T> data)
 {
-    timer timer;
+    posix_time::ptime start = posix_time::microsec_clock::universal_time();
     quick_sort(data.begin(), data.end(), std::less<T>());
-    double elapsed = timer.elapsed();
-    log(data_traits, "quick_sort", data.size(), elapsed);
+    posix_time::time_duration td = posix_time::microsec_clock::universal_time() - start;
+
+    log(data_traits, "quick_sort", data.size(), td.total_microseconds());
 }
 
 template <typename T>
 void measure_std_sort(const string &data_traits, vector<T> data)
 {
-    timer timer;
+    posix_time::ptime start = posix_time::microsec_clock::universal_time();
     std::sort(data.begin(), data.end());
-    double elapsed = timer.elapsed();
-    log(data_traits, "std_sort", data.size(), elapsed);
+    posix_time::time_duration td = posix_time::microsec_clock::universal_time() - start;
+
+    log(data_traits, "std_sort", data.size(), td.total_microseconds());
 }
 
 int main(int argc, char *argv[])
@@ -112,7 +112,9 @@ int main(int argc, char *argv[])
     // Create current log directory path
     g_log_dir = filesystem::complete("logs/", filesystem::current_path());
     filesystem::create_directory(g_log_dir);
-    g_log_dir = filesystem::complete(lexical_cast<string>(getpid()) + '/', g_log_dir);
+    string now = lexical_cast<string>(boost::posix_time::second_clock::universal_time());
+    replace_all(now, " ", "_");
+    g_log_dir = filesystem::complete(now, g_log_dir);
     filesystem::create_directory(g_log_dir);
     if (!filesystem::exists(g_log_dir)) {
         cerr << "Unable to create log directory " << g_log_dir << endl;
@@ -130,9 +132,12 @@ int main(int argc, char *argv[])
     threadpool::pool tp(thread::hardware_concurrency());
 
     cout << "Measure performance for random data..." << endl;
-    vector<int> data;
-    for (unsigned int i = min_size; i <= max_size; i++) {
+    vector<int> data(max_size);
+    for (unsigned int i = 0; i < max_size; i++) {
         data.push_back(dice());
+        if (i < min_size) {
+            continue;
+        }
         tp.schedule(bind(measure_merge_sort<int>, "random", data));
         tp.schedule(bind(measure_quick_sort<int>, "random", data));
         tp.schedule(bind(measure_std_sort<int>, "random",  data));
@@ -140,8 +145,11 @@ int main(int argc, char *argv[])
 
     cout << "Measure performance for sorted data..." << endl;
     data.clear();
-    for (unsigned int i = min_size; i <= max_size; i++) {
+    for (unsigned int i = 0; i < max_size; i++) {
         data.push_back(i);
+        if (i < min_size) {
+            continue;
+        }
         tp.schedule(bind(measure_merge_sort<int>, "sorted", data));
         tp.schedule(bind(measure_quick_sort<int>, "sorted", data));
         tp.schedule(bind(measure_std_sort<int>, "sorted", data));
