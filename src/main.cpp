@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
     // Create our threadpool
     threadpool::pool tp(thread_count);
 
-    // Create a bunch of datasets together with a printable name
+    // Create a bunch of data together with printable names
     vector<int> data[4];
     string names[4] = {"random", "sorted", "reverse sorted", "partially sorted"};
 
