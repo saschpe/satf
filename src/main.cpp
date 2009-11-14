@@ -31,7 +31,7 @@
 #include <boost/random.hpp>
 #include <boost/thread.hpp>
 
-#include <algorithm>    // for std::sort()
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -75,7 +75,7 @@ void print(const vector<T> &before, const vector<T> &after, const string &line_p
 template <typename T>
 void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
 {
-    vector<T> tmp = data;   // work on a copy to not destroy original content
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     heap_sort(tmp.begin(), tmp.end(), std::less<T>());
@@ -87,7 +87,7 @@ void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
 template <typename T>
 void measure_merge_sort(const vector<T> &data, const string &data_traits = "")
 {
-    vector<T> tmp = data;   // work on a copy to not destroy original content
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     merge_sort(tmp.begin(), tmp.end(), std::less<T>());
@@ -99,7 +99,7 @@ void measure_merge_sort(const vector<T> &data, const string &data_traits = "")
 template <typename T>
 void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
 {
-    vector<T> tmp = data;   // work on a copy to not destroy original content
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     quick_sort(tmp.begin(), tmp.end(), std::less<T>());
@@ -111,7 +111,7 @@ void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
 template <typename T>
 void measure_std_sort(const vector<T> &data, const string &data_traits = "")
 {
-    vector<T> tmp = data;   // work on a copy to not destroy original content
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::sort(tmp.begin(), tmp.end());
@@ -123,7 +123,7 @@ void measure_std_sort(const vector<T> &data, const string &data_traits = "")
 template <typename T>
 void measure_std_partial_sort(const vector<T> &data, const string &data_traits = "")
 {
-    vector<T> tmp = data;   // work on a copy to not destroy original content
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::partial_sort(tmp.begin(), tmp.end(), tmp.end());
@@ -135,7 +135,7 @@ void measure_std_partial_sort(const vector<T> &data, const string &data_traits =
 template <typename T>
 void measure_std_stable_sort(const vector<T> &data, const string &data_traits = "")
 {
-    vector<T> tmp = data;   // work on a copy to not destroy original content
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::stable_sort(tmp.begin(), tmp.end());
