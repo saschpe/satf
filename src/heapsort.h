@@ -17,31 +17,23 @@
     02110-1301, USA.
 */
 
-#ifndef QUICKSORT_H
-#define QUICKSORT_H
-
-// Slightly adapted the version found here:
-// http://en.wikibooks.org/wiki/Algorithm_implementation/Sorting/Quicksort#C.2B.2B
+#ifndef HEAPSORT_H
+#define HEAPSORT_H
 
 template <class RandomAccessIterator, class Less>
-void quick_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
+void heap_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
 {
-    if (first != beyond) {
-        RandomAccessIterator middle = std::partition(first, beyond, std::bind2nd(less, *first));
-        quick_sort(first, middle, less);
-        quick_sort(std::max(first + 1, middle), beyond, less);
-    }
+    std::make_heap(first, beyond);
+    std::sort_heap(first, beyond);
 }
 
 template <class InputIterator, class OutputIterator, class Less>
-OutputIterator quick_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less )
+OutputIterator heap_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less )
 {
-    if (first != beyond) {
-        InputIterator middle = std::partition(first, beyond, std::bind2nd(less, *first));
-        quick_sort(first, middle, less);
-        quick_sort(std::max(first + 1, middle), beyond, less);
-    }
+    std::make_heap(first, beyond);
+    std::sort_heap(first, beyond);
     return first;
 }
 
 #endif
+

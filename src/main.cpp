@@ -18,6 +18,7 @@
 */
 
 #include "boost/threadpool.hpp"
+#include "heapsort.h"
 #include "mergesort.h"
 #include "quicksort.h"
 
@@ -72,6 +73,19 @@ void print(const vector<T> &before, const vector<T> &after, const string &line_p
 }
 
 template <typename T>
+void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // work on a copy to not destroy original content
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    heap_sort(tmp.begin(), tmp.end(), std::less<T>());
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+
+    log(data_traits, "heap_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "heap_sort " + data_traits + ' ');
+}
+
+template <typename T>
 void measure_merge_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // work on a copy to not destroy original content
@@ -93,8 +107,8 @@ void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
     quick_sort(tmp.begin(), tmp.end(), std::less<T>());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
 
-    log(data_traits, "quick_sort", tmp.size(), td.total_microseconds());
-    print<T>(data, tmp, "quick_sort " + data_traits + ' ');
+    log(data_traits, "quick_sort (recursive)", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "quick_sort (recursive)" + data_traits + ' ');
 }
 
 template <typename T>
@@ -106,8 +120,34 @@ void measure_std_sort(const vector<T> &data, const string &data_traits = "")
     std::sort(tmp.begin(), tmp.end());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
 
-    log(data_traits, "std_sort", tmp.size(), td.total_microseconds());
-    print<T>(data, tmp, "std_sort " + data_traits + ' ');
+    log(data_traits, "std_sort (quicksort-based)", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "std_sort (quicksort-based)" + data_traits + ' ');
+}
+
+template <typename T>
+void measure_std_partial_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // work on a copy to not destroy original content
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    std::partial_sort(tmp.begin(), tmp.end(), tmp.end());
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+
+    log(data_traits, "std_partial_sort (heapsort-based)", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "std_partial_sort (heapsort-based)" + data_traits + ' ');
+}
+
+template <typename T>
+void measure_std_stable_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // work on a copy to not destroy original content
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    std::stable_sort(tmp.begin(), tmp.end());
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+
+    log(data_traits, "std_stable_sort (mergesort-based)", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "std_stable_sort (mergesort-based)" + data_traits + ' ');
 }
 
 int main(int argc, char *argv[])
@@ -127,6 +167,7 @@ int main(int argc, char *argv[])
     program_options::store(program_options::parse_command_line(argc, argv, desc), vm);
     program_options::notify(vm);
 
+    // Additional command line argument checks
     if (vm.count("help")) {
         cout << "Usage: " << argv[0] << " [OPTIONS]..." << endl << desc << endl;
         return 1;
@@ -162,56 +203,33 @@ int main(int argc, char *argv[])
     // Create our threadpool
     threadpool::pool tp(thread_count);
 
-    cout << "measure random data..." << endl;
-    vector<int> data;
-    for (unsigned int i = 1; i <= max_size; i++) {
-        data.push_back(dice());
-        if (i < min_size) {
-            continue;
-        }
-        tp.schedule(bind(measure_merge_sort<int>, data, "random"));
-        tp.schedule(bind(measure_quick_sort<int>, data, "random"));
-        tp.schedule(bind(measure_std_sort<int>, data, "random"));
-    }
+    // Create a bunch of datasets together with a printable name
+    vector<int> data[4];
+    const string names[4] = {"random", "sorted", "reverse sorted", "partially sorted"};
 
-    cout << "measure already sorted data..." << endl;
-    data.clear();
+    // Iterate over inceasing dataset sizes with each algorithm
     for (unsigned int i = 1; i <= max_size; i++) {
-        data.push_back(i);
-        if (i < min_size) {
-            continue;
-        }
-        tp.schedule(bind(measure_merge_sort<int>, data, "sorted"));
-        tp.schedule(bind(measure_quick_sort<int>, data, "sorted"));
-        tp.schedule(bind(measure_std_sort<int>, data, "sorted"));
-    }
-
-    cout << "measure already reverse sorted data..." << endl;
-    data.clear();
-    for (unsigned int i = 1; i <= max_size; i++) {
-        data.push_back(max_size - i);
-        if (i < min_size) {
-            continue;
-        }
-        tp.schedule(bind(measure_merge_sort<int>, data, "reversed"));
-        tp.schedule(bind(measure_quick_sort<int>, data, "reversed"));
-        tp.schedule(bind(measure_std_sort<int>, data, "reversed"));
-    }
-
-    cout << "measure partially (50%) sorted data..." << endl;
-    data.clear();
-    for (unsigned int i = 1; i <= max_size; i++) {
-        data.push_back(i);
+        data[0].push_back(dice());          // Random values
+        data[1].push_back(i);               // Sorted values
+        data[2].push_back(max_size - i);    // Reverse sorted values
+        data[3].push_back(i);               // Partially sorted values
         if (i / (float)max_size == 0.5) {
             // Results in 50% sorted data, not really 'partial' but does the trick
-            sort(data.begin(), data.end());
+            sort(data[3].begin(), data[3].end());
         }
-        if (i < min_size) {
-            continue;
+        if (i < min_size) {                 // Make sure we first reach the disered dataset
+            continue;                       // size before doing anything useful
         }
-        tp.schedule(bind(measure_merge_sort<int>, data, "partial"));
-        tp.schedule(bind(measure_quick_sort<int>, data, "partial"));
-        tp.schedule(bind(measure_std_sort<int>, data, "partial"));
+
+        // Apply every algorithm to all dataset types
+        for (unsigned int j = 0; j < 3; j++) {
+            cout << "measure " << names[j] << " data..." << endl;
+            tp.schedule(bind(measure_heap_sort<int>, data[j], names[j]));
+            tp.schedule(bind(measure_quick_sort<int>, data[j], names[j]));
+            tp.schedule(bind(measure_std_sort<int>, data[j], names[j]));
+            tp.schedule(bind(measure_std_partial_sort<int>, data[j], names[j]));
+            tp.schedule(bind(measure_std_stable_sort<int>, data[j], names[j]));
+        }
     }
     return 0;
 }
