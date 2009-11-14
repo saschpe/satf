@@ -80,7 +80,6 @@ void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     heap_sort(tmp.begin(), tmp.end(), std::less<T>());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-
     log(data_traits, "heap_sort", tmp.size(), td.total_microseconds());
     print<T>(data, tmp, "heap_sort " + data_traits + ' ');
 }
@@ -93,7 +92,6 @@ void measure_merge_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     merge_sort(tmp.begin(), tmp.end(), std::less<T>());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-
     log(data_traits, "merge_sort", tmp.size(), td.total_microseconds());
     print<T>(data, tmp, "merge_sort " + data_traits + ' ');
 }
@@ -106,7 +104,6 @@ void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     quick_sort(tmp.begin(), tmp.end(), std::less<T>());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-
     log(data_traits, "quick_sort (recursive)", tmp.size(), td.total_microseconds());
     print<T>(data, tmp, "quick_sort (recursive)" + data_traits + ' ');
 }
@@ -119,7 +116,6 @@ void measure_std_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::sort(tmp.begin(), tmp.end());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-
     log(data_traits, "std_sort (quicksort-based)", tmp.size(), td.total_microseconds());
     print<T>(data, tmp, "std_sort (quicksort-based)" + data_traits + ' ');
 }
@@ -132,7 +128,6 @@ void measure_std_partial_sort(const vector<T> &data, const string &data_traits =
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::partial_sort(tmp.begin(), tmp.end(), tmp.end());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-
     log(data_traits, "std_partial_sort (heapsort-based)", tmp.size(), td.total_microseconds());
     print<T>(data, tmp, "std_partial_sort (heapsort-based)" + data_traits + ' ');
 }
@@ -145,7 +140,6 @@ void measure_std_stable_sort(const vector<T> &data, const string &data_traits = 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::stable_sort(tmp.begin(), tmp.end());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-
     log(data_traits, "std_stable_sort (mergesort-based)", tmp.size(), td.total_microseconds());
     print<T>(data, tmp, "std_stable_sort (mergesort-based)" + data_traits + ' ');
 }
@@ -205,9 +199,9 @@ int main(int argc, char *argv[])
 
     // Create a bunch of datasets together with a printable name
     vector<int> data[4];
-    const string names[4] = {"random", "sorted", "reverse sorted", "partially sorted"};
+    string names[4] = {"random", "sorted", "reverse sorted", "partially sorted"};
 
-    // Iterate over inceasing dataset sizes with each algorithm
+    // Iterate over increasing data sizes with each algorithm
     for (unsigned int i = 1; i <= max_size; i++) {
         data[0].push_back(dice());          // Random values
         data[1].push_back(i);               // Sorted values
@@ -217,11 +211,13 @@ int main(int argc, char *argv[])
             // Results in 50% sorted data, not really 'partial' but does the trick
             sort(data[3].begin(), data[3].end());
         }
-        if (i < min_size) {                 // Make sure we first reach the disered dataset
-            continue;                       // size before doing anything useful
+
+        // Make sure we first reach the desired data size before doing anything useful
+        if (i < min_size) {
+            continue;
         }
 
-        // Apply every algorithm to all dataset types
+        // Apply every algorithm to all data types
         for (unsigned int j = 0; j < 3; j++) {
             cout << "measure " << names[j] << " data..." << endl;
             tp.schedule(bind(measure_heap_sort<int>, data[j], names[j]));
