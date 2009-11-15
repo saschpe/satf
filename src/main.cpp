@@ -19,7 +19,6 @@
 
 #include "boost/threadpool.hpp"
 #include "heapsort.h"
-#include "mergesort.h"
 #include "quicksort.h"
 
 #include <boost/bind.hpp>
@@ -82,18 +81,6 @@ void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "heap_sort", tmp.size(), td.total_microseconds());
     print<T>(data, tmp, "heap_sort " + data_traits + ' ');
-}
-
-template <typename T>
-void measure_merge_sort(const vector<T> &data, const string &data_traits = "")
-{
-    vector<T> tmp = data;   // Work on a copy to not destroy original content
-
-    posix_time::ptime start = posix_time::microsec_clock::local_time();
-    merge_sort(tmp.begin(), tmp.end(), std::less<T>());
-    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "merge_sort", tmp.size(), td.total_microseconds());
-    print<T>(data, tmp, "merge_sort " + data_traits + ' ');
 }
 
 template <typename T>
@@ -199,7 +186,7 @@ int main(int argc, char *argv[])
 
     // Create a bunch of data together with printable names
     vector<int> data[4];
-    string names[4] = {"random", "sorted", "reverse sorted", "partially sorted"};
+    string data_names[4] = {"random", "sorted", "reverse sorted", "partially sorted"};
 
     // Iterate over increasing data sizes with each algorithm
     for (unsigned int i = 1; i <= max_size; i++) {
@@ -219,12 +206,12 @@ int main(int argc, char *argv[])
 
         // Apply every algorithm to all data types
         for (unsigned int j = 0; j < 3; j++) {
-            cout << "measure " << names[j] << " data..." << endl;
-            tp.schedule(bind(measure_heap_sort<int>, data[j], names[j]));
-            tp.schedule(bind(measure_quick_sort<int>, data[j], names[j]));
-            tp.schedule(bind(measure_std_sort<int>, data[j], names[j]));
-            tp.schedule(bind(measure_std_partial_sort<int>, data[j], names[j]));
-            tp.schedule(bind(measure_std_stable_sort<int>, data[j], names[j]));
+            cout << "measure " << data_names[j] << " data..." << endl;
+            tp.schedule(bind(measure_heap_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_quick_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_std_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_std_partial_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_std_stable_sort<int>, data[j], data_names[j]));
         }
     }
     return 0;
