@@ -98,11 +98,11 @@ for DIR in `ls $LAST_LOG_DIR`; do
             set terminal png font "arial" 8
             set title "algorithm: $FILE $DIR\n$UNAME"
             set output '$LAST_PLOT_DIR/$DIR/$FILE.png'
-            plot '$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title "$FILE"
+            plot '$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title "$FILE" with lines
             quit
             EOF`
         # Build up the input for gnuplot 'plot' command to use for the combined plot
-        ALL_IN_ONE_PLOT_LINE+=`echo -e "'$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title \"$FILE\", "`
+        ALL_IN_ONE_PLOT_LINE+=`echo -e "'$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title \"$FILE\" with lines, "`
     done
 
     # Finally generate a function plot with all algorithms combined and remove the trailing ', '
