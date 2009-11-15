@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 
     // Create a bunch of data together with printable names
     vector<int> data[4];
-    string data_names[4] = {"random", "sorted", "reverse_sorted", "partially_sorted"};
+    string data_names[4] = {"random_data", "sorted_data", "reverse_sorted_data", "partially_sorted_data"};
 
     // Iterate over increasing data sizes with each algorithm
     for (unsigned int i = 1; i <= max_size; i++) {
