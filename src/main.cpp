@@ -91,8 +91,8 @@ void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     quick_sort(tmp.begin(), tmp.end(), std::less<T>());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "quick_sort (recursive)", tmp.size(), td.total_microseconds());
-    print<T>(data, tmp, "quick_sort (recursive)" + data_traits + ' ');
+    log(data_traits, "quick_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "quick_sort" + data_traits + ' ');
 }
 
 template <typename T>
@@ -103,8 +103,8 @@ void measure_std_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::sort(tmp.begin(), tmp.end());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "std_sort (quicksort-based)", tmp.size(), td.total_microseconds());
-    print<T>(data, tmp, "std_sort (quicksort-based)" + data_traits + ' ');
+    log(data_traits, "std_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "std_sort" + data_traits + ' ');
 }
 
 template <typename T>
@@ -115,8 +115,8 @@ void measure_std_partial_sort(const vector<T> &data, const string &data_traits =
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::partial_sort(tmp.begin(), tmp.end(), tmp.end());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "std_partial_sort (heapsort-based)", tmp.size(), td.total_microseconds());
-    print<T>(data, tmp, "std_partial_sort (heapsort-based)" + data_traits + ' ');
+    log(data_traits, "std_partial_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "std_partial_sort" + data_traits + ' ');
 }
 
 template <typename T>
@@ -127,8 +127,8 @@ void measure_std_stable_sort(const vector<T> &data, const string &data_traits = 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::stable_sort(tmp.begin(), tmp.end());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "std_stable_sort (mergesort-based)", tmp.size(), td.total_microseconds());
-    print<T>(data, tmp, "std_stable_sort (mergesort-based)" + data_traits + ' ');
+    log(data_traits, "std_stable_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "std_stable_sort" + data_traits + ' ');
 }
 
 int main(int argc, char *argv[])
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 
     // Create a bunch of data together with printable names
     vector<int> data[4];
-    string data_names[4] = {"random", "sorted", "reverse sorted", "partially sorted"};
+    string data_names[4] = {"random", "sorted", "reverse_sorted", "partially_sorted"};
 
     // Iterate over increasing data sizes with each algorithm
     for (unsigned int i = 1; i <= max_size; i++) {
@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
         }
 
         // Apply every algorithm to all data types
-        for (unsigned int j = 0; j < 3; j++) {
+        for (unsigned int j = 0; j < 4; j++) {
             cout << "measure " << data_names[j] << " data..." << endl;
             tp.schedule(bind(measure_heap_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_quick_sort<int>, data[j], data_names[j]));
