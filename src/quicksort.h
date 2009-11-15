@@ -36,12 +36,12 @@ void quick_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less le
 template <class InputIterator, class OutputIterator, class Less>
 OutputIterator quick_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less )
 {
-    if (first != beyond) {
+    /*if (first != beyond) {
         InputIterator middle = std::partition(first, beyond, std::bind2nd(less, *first));
         quick_sort(first, middle, less);
         quick_sort(std::max(first + 1, middle), beyond, less);
-    }
-    return first;
+    }*/
+    return result;
 }
 
 #endif

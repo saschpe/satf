@@ -30,9 +30,9 @@ void heap_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less les
 template <class InputIterator, class OutputIterator, class Less>
 OutputIterator heap_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less )
 {
-    std::make_heap(first, beyond);
-    std::sort_heap(first, beyond);
-    return first;
+    /*std::make_heap(first, beyond);
+    std::sort_heap(first, beyond);*/
+    return result;
 }
 
 #endif
