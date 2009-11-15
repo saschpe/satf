@@ -8,6 +8,14 @@ This little 'framework' allows to perform runtime measurement of spatial sort al
  - reverse sorted data
  - partially sorted data
 
+These algorithms are currently measured:
+
+ - heap_sort
+ - quick_sort (recursive)
+ - std::partial_sort (based on heap_sort)
+ - std::stable_sort (based on merge_sort)
+ - std::sort (based on quicksort)
+
 
 INSTALLATION
 ------------
