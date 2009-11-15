@@ -91,8 +91,8 @@ void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     quick_sort(tmp.begin(), tmp.end(), std::less<T>());
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "quick_sort", tmp.size(), td.total_microseconds());
-    print<T>(data, tmp, "quick_sort" + data_traits + ' ');
+    log(data_traits, "recursive_quick_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "recursive_quick_sort" + data_traits + ' ');
 }
 
 template <typename T>
