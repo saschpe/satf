@@ -18,8 +18,10 @@
 */
 
 #include "boost/threadpool.hpp"
+#include "bubbleextsort.h"
 #include "heapsort.h"
 #include "quicksort.h"
+#include "splitsort.h"
 
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
@@ -131,6 +133,30 @@ void measure_std_stable_sort(const vector<T> &data, const string &data_traits = 
     print<T>(data, tmp, "std_stable_sort" + data_traits + ' ');
 }
 
+template <typename T>
+void measure_split_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    split_sort(tmp.begin(), tmp.end(), std::less<T>());
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+    log(data_traits, "split_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "split_sort" + data_traits + ' ');
+}
+
+template <typename T>
+void measure_bubble_ext_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    bubble_ext_sort(tmp.begin(), tmp.end(), std::less<T>());
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+    log(data_traits, "bubble_ext_sort", tmp.size(), td.total_microseconds());
+    print<T>(data, tmp, "bubble_ext_sort" + data_traits + ' ');
+}
+
 int main(int argc, char *argv[])
 {
     unsigned int min_size, max_size;
@@ -212,6 +238,8 @@ int main(int argc, char *argv[])
             tp.schedule(bind(measure_std_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_partial_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_stable_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_split_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_bubble_ext_sort<int>, data[j], data_names[j]));
         }
     }
     return 0;
