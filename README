@@ -15,6 +15,8 @@ These algorithms are currently measured:
  - std::partial_sort (based on heap_sort)
  - std::stable_sort (based on merge_sort)
  - std::sort (based on quicksort)
+ - split_sort (contributed)
+ - bubble_ext_sort (contributed)
 
 
 INSTALLATION
