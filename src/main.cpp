@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
         for (unsigned int j = 0; j < 4; j++) {
             cout << "measure " << data_names[j] << " data..." << endl;
             tp.schedule(bind(measure_heap_sort<int>, data[j], data_names[j]));
-            tp.schedule(bind(measure_quick_sort<int>, data[j], data_names[j]));
+            //tp.schedule(bind(measure_quick_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_partial_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_stable_sort<int>, data[j], data_names[j]));
