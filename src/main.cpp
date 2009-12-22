@@ -41,7 +41,7 @@ using namespace std;
 static filesystem::path g_log_dir;
 static bool g_verbose = false;
 
-void log(const string &data_traits, const string &name, int size, unsigned int time_msecs, unsigned int comparison_count)
+void log(const string &data_traits, const string &name, int size, unsigned int time_msecs, unsigned int comparison_count = -1)
 {
     static mutex log_mutex;
 
@@ -212,7 +212,9 @@ int main(int argc, char *argv[])
 
         // Apply every algorithm to all data types
         for (unsigned int j = 0; j < 4; j++) {
-            cout << "measure " << data_names[j] << " data..." << endl;
+            if (g_verbose) {
+                cout << "measure " << data_names[j] << " data..." << endl;
+            }
             tp.schedule(bind(measure_heap_sort<int>, data[j], data_names[j]));
             //tp.schedule(bind(measure_quick_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_sort<int>, data[j], data_names[j]));
