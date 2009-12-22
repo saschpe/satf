@@ -18,7 +18,7 @@
 */
 
 #include "boost/threadpool.hpp"
-#include "compareless.h"
+#include "countless.h"
 #include "heapsort.h"
 #include "quicksort.h"
 
@@ -73,7 +73,7 @@ template <typename T>
 void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
-    CompareLess<T> less;
+    CountLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     heap_sort(tmp.begin(), tmp.end(), less);
@@ -86,7 +86,7 @@ template <typename T>
 void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
-    CompareLess<T> less;
+    CountLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     quick_sort(tmp.begin(), tmp.end(), less);
@@ -99,7 +99,7 @@ template <typename T>
 void measure_std_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
-    CompareLess<T> less;
+    CountLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::sort(tmp.begin(), tmp.end(), less);
@@ -112,7 +112,7 @@ template <typename T>
 void measure_std_partial_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
-    CompareLess<T> less;
+    CountLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::partial_sort(tmp.begin(), tmp.end(), tmp.end(), less);
@@ -125,7 +125,7 @@ template <typename T>
 void measure_std_stable_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
-    CompareLess<T> less;
+    CountLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::stable_sort(tmp.begin(), tmp.end(), less);

@@ -17,14 +17,14 @@
     02110-1301, USA.
 */
 
-#ifndef COMPARELESS_H
-#define COMPARELESS_H
+#ifndef COUNTLESS_H
+#define COUNTLESS_H
 
 template <typename T>
-class CompareLess
+class CountLess
 {
 public:
-    CompareLess() : m_count(0) {};
+    CountLess() : m_count(0) {};
 
     void reset() { m_count = 0; }
     unsigned int count() const { return m_count; }
@@ -38,4 +38,4 @@ private:
     unsigned int m_count;
 };
 
-#endif // COMPARELESS_H
+#endif // COUNTLESS_H
