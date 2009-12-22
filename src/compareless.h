@@ -20,6 +20,7 @@
 #ifndef COMPARELESS_H
 #define COMPARELESS_H
 
+template <typename T>
 class CompareLess
 {
 public:
@@ -28,7 +29,6 @@ public:
     void reset() { m_count = 0; }
     unsigned int count() const { return m_count; }
 
-    template <typename T>
     bool operator()(T a, T b) {
         m_count++;
         return a < b;
