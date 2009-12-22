@@ -21,12 +21,10 @@
 #include "countless.h"
 #include "heapsort.h"
 #include "quicksort.h"
+#include "utility.h"
 
 #include <boost/bind.hpp>
 #include <boost/date_time.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 #include <boost/random.hpp>
 #include <boost/thread.hpp>
@@ -38,37 +36,6 @@
 using namespace boost;
 using namespace std;
 
-static filesystem::path g_log_dir;
-
-void log(const string &data_traits, const string &name, int size, unsigned int time_msecs, unsigned int comparison_count = -1)
-{
-    static mutex log_mutex;
-
-    lock_guard<mutex> lock(log_mutex);
-    filesystem::path log_dir = filesystem::complete(data_traits, g_log_dir);
-    filesystem::path log_file = filesystem::complete(name, log_dir);
-    filesystem::create_directory(log_dir);
-    filesystem::ofstream ofs(log_file, ios_base::app | ios_base::out);
-    ofs << size << ' ' << time_msecs << ' ' << comparison_count << endl;
-}
-
-template <typename T>
-void print(const vector<T> &before, const vector<T> &after, const string &line_prefix = "")
-{
-    static mutex print_mutex;
-
-    lock_guard<mutex> lock(print_mutex);
-    cout << line_prefix << "[";
-    for (unsigned int i = 0; i < before.size(); i++) {
-        cout << before[i] << ((i == before.size() - 1) ? "" : ", ");
-    }
-    cout << "] --> [";
-    for (unsigned int i = 0; i < after.size(); i++) {
-        cout << after[i] << ((i == after.size() - 1) ? "" : ", ");
-    }
-    cout << "]" << endl;
-}
-
 template <typename T>
 void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
 {
@@ -79,7 +46,7 @@ void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
     heap_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "heap_sort", tmp.size(), td.total_microseconds(), less.count());
-    //print<T>(data, tmp, "heap_sort " + data_traits + ' ');
+    //print_vector<T>(data, tmp, "heap_sort " + data_traits + ' ');
 }
 
 template <typename T>
@@ -92,7 +59,7 @@ void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
     quick_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "recursive_quick_sort", tmp.size(), td.total_microseconds(), less.count());
-    //print<T>(data, tmp, "recursive_quick_sort" + data_traits + ' ');
+    //print_vector<T>(data, tmp, "recursive_quick_sort" + data_traits + ' ');
 }
 
 template <typename T>
@@ -105,7 +72,7 @@ void measure_std_sort(const vector<T> &data, const string &data_traits = "")
     std::sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "std_sort", tmp.size(), td.total_microseconds(), less.count());
-    //print<T>(data, tmp, "std_sort" + data_traits + ' ');
+    //print_vector<T>(data, tmp, "std_sort" + data_traits + ' ');
 }
 
 template <typename T>
@@ -118,7 +85,7 @@ void measure_std_partial_sort(const vector<T> &data, const string &data_traits =
     std::partial_sort(tmp.begin(), tmp.end(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "std_partial_sort", tmp.size(), td.total_microseconds(), less.count());
-    //print<T>(data, tmp, "std_partial_sort" + data_traits + ' ');
+    //print_vector<T>(data, tmp, "std_partial_sort" + data_traits + ' ');
 }
 
 template <typename T>
@@ -131,7 +98,7 @@ void measure_std_stable_sort(const vector<T> &data, const string &data_traits = 
     std::stable_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "std_stable_sort", tmp.size(), td.total_microseconds(), less.count());
-    //print<T>(data, tmp, "std_stable_sort" + data_traits + ' ');
+    //print_vector<T>(data, tmp, "std_stable_sort" + data_traits + ' ');
 }
 
 int main(int argc, char *argv[])
@@ -162,18 +129,7 @@ int main(int argc, char *argv[])
     cout << "using " << thread_count << " threads and a data size range from " << min_size << " to " << max_size << endl;
 
     // Create current log directory path
-    g_log_dir = filesystem::complete("logs/", filesystem::current_path());
-    filesystem::create_directory(g_log_dir);
-    string now = lexical_cast<string>(boost::posix_time::second_clock::local_time());
-    replace_all(now, " ", "_");
-    g_log_dir = filesystem::complete(now, g_log_dir);
-    filesystem::create_directory(g_log_dir);
-    if (!filesystem::exists(g_log_dir)) {
-        cerr << "unable to create log directory " << g_log_dir << endl;
-        return 1;
-    } else {
-        cout << "created log directory " << g_log_dir << endl;
-    }
+    log_init("logs/");
 
     // Build a nice random number generator
     mt19937 rng;
