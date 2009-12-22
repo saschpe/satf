@@ -23,9 +23,21 @@
 #include <iostream>
 #include <vector>
 
+/**
+ *
+ */
 bool log_init(const std::string &dir);
+
+/**
+ *
+ * This method is thread-safe and reentrant.
+ */
 void log(const std::string &data_traits, const std::string &name, int size, unsigned int time_msecs, unsigned int comparison_count = -1);
 
+/**
+ *
+ * This method is thread-safe and reentrant.
+ */
 template <typename T>
 void print_vector(const std::vector<T> &before, const std::vector<T> &after, const std::string &line_prefix = "");
 
