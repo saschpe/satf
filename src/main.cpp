@@ -39,7 +39,6 @@ using namespace boost;
 using namespace std;
 
 static filesystem::path g_log_dir;
-static bool g_verbose = false;
 
 void log(const string &data_traits, const string &name, int size, unsigned int time_msecs, unsigned int comparison_count = -1)
 {
@@ -59,17 +58,15 @@ void print(const vector<T> &before, const vector<T> &after, const string &line_p
     static mutex print_mutex;
 
     lock_guard<mutex> lock(print_mutex);
-    if (g_verbose) {
-        cout << line_prefix << "[";
-        for (unsigned int i = 0; i < before.size(); i++) {
-            cout << before[i] << ((i == before.size() - 1) ? "" : ", ");
-        }
-        cout << "] --> [";
-        for (unsigned int i = 0; i < after.size(); i++) {
-            cout << after[i] << ((i == after.size() - 1) ? "" : ", ");
-        }
-        cout << "]" << endl;
+    cout << line_prefix << "[";
+    for (unsigned int i = 0; i < before.size(); i++) {
+        cout << before[i] << ((i == before.size() - 1) ? "" : ", ");
     }
+    cout << "] --> [";
+    for (unsigned int i = 0; i < after.size(); i++) {
+        cout << after[i] << ((i == after.size() - 1) ? "" : ", ");
+    }
+    cout << "]" << endl;
 }
 
 template <typename T>
@@ -82,7 +79,7 @@ void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
     heap_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "heap_sort", tmp.size(), td.total_microseconds(), less.count());
-    print<T>(data, tmp, "heap_sort " + data_traits + ' ');
+    //print<T>(data, tmp, "heap_sort " + data_traits + ' ');
 }
 
 template <typename T>
@@ -95,7 +92,7 @@ void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
     quick_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "recursive_quick_sort", tmp.size(), td.total_microseconds(), less.count());
-    print<T>(data, tmp, "recursive_quick_sort" + data_traits + ' ');
+    //print<T>(data, tmp, "recursive_quick_sort" + data_traits + ' ');
 }
 
 template <typename T>
@@ -108,7 +105,7 @@ void measure_std_sort(const vector<T> &data, const string &data_traits = "")
     std::sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "std_sort", tmp.size(), td.total_microseconds(), less.count());
-    print<T>(data, tmp, "std_sort" + data_traits + ' ');
+    //print<T>(data, tmp, "std_sort" + data_traits + ' ');
 }
 
 template <typename T>
@@ -121,7 +118,7 @@ void measure_std_partial_sort(const vector<T> &data, const string &data_traits =
     std::partial_sort(tmp.begin(), tmp.end(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "std_partial_sort", tmp.size(), td.total_microseconds(), less.count());
-    print<T>(data, tmp, "std_partial_sort" + data_traits + ' ');
+    //print<T>(data, tmp, "std_partial_sort" + data_traits + ' ');
 }
 
 template <typename T>
@@ -134,7 +131,7 @@ void measure_std_stable_sort(const vector<T> &data, const string &data_traits = 
     std::stable_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log(data_traits, "std_stable_sort", tmp.size(), td.total_microseconds(), less.count());
-    print<T>(data, tmp, "std_stable_sort" + data_traits + ' ');
+    //print<T>(data, tmp, "std_stable_sort" + data_traits + ' ');
 }
 
 int main(int argc, char *argv[])
@@ -148,7 +145,6 @@ int main(int argc, char *argv[])
         ("min", program_options::value<unsigned int>(&min_size)->default_value(1), "set minimum data size")
         ("max", program_options::value<unsigned int>(&max_size)->default_value(1000), "set maximum data size")
         ("theads", program_options::value<unsigned int>(&thread_count)->default_value(thread::hardware_concurrency()), "set worker thead count")
-        ("verbose", "display extra runtime output")
         ("help", "display this help and exit");
     program_options::variables_map vm;
     program_options::store(program_options::parse_command_line(argc, argv, desc), vm);
@@ -162,9 +158,6 @@ int main(int argc, char *argv[])
     if (min_size > max_size) {
         cerr << "error: invalid minimum data size!" << endl;
         return 1;
-    }
-    if (vm.count("verbose")) {
-        g_verbose = true;
     }
     cout << "using " << thread_count << " threads and a data size range from " << min_size << " to " << max_size << endl;
 
@@ -212,9 +205,6 @@ int main(int argc, char *argv[])
 
         // Apply every algorithm to all data types
         for (unsigned int j = 0; j < 4; j++) {
-            if (g_verbose) {
-                cout << "measure " << data_names[j] << " data..." << endl;
-            }
             tp.schedule(bind(measure_heap_sort<int>, data[j], data_names[j]));
             //tp.schedule(bind(measure_quick_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_sort<int>, data[j], data_names[j]));
