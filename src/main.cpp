@@ -18,6 +18,7 @@
 */
 
 #include "boost/threadpool.hpp"
+#include "compareless.h"
 #include "heapsort.h"
 #include "quicksort.h"
 
@@ -40,7 +41,7 @@ using namespace std;
 static filesystem::path g_log_dir;
 static bool g_verbose = false;
 
-void log(const string &data_traits, const string &name, int size, unsigned int time_msecs)
+void log(const string &data_traits, const string &name, int size, unsigned int time_msecs, unsigned int comparison_count)
 {
     static mutex log_mutex;
 
@@ -49,7 +50,7 @@ void log(const string &data_traits, const string &name, int size, unsigned int t
     filesystem::path log_file = filesystem::complete(name, log_dir);
     filesystem::create_directory(log_dir);
     filesystem::ofstream ofs(log_file, ios_base::app | ios_base::out);
-    ofs << size << ' ' << time_msecs << endl;
+    ofs << size << ' ' << time_msecs << ' ' << comparison_count << endl;
 }
 
 template <typename T>
@@ -75,11 +76,12 @@ template <typename T>
 void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CompareLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
-    heap_sort(tmp.begin(), tmp.end(), std::less<T>());
+    heap_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "heap_sort", tmp.size(), td.total_microseconds());
+    log(data_traits, "heap_sort", tmp.size(), td.total_microseconds(), less.count());
     print<T>(data, tmp, "heap_sort " + data_traits + ' ');
 }
 
@@ -87,11 +89,12 @@ template <typename T>
 void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CompareLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
-    quick_sort(tmp.begin(), tmp.end(), std::less<T>());
+    quick_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "recursive_quick_sort", tmp.size(), td.total_microseconds());
+    log(data_traits, "recursive_quick_sort", tmp.size(), td.total_microseconds(), less.count());
     print<T>(data, tmp, "recursive_quick_sort" + data_traits + ' ');
 }
 
@@ -99,11 +102,12 @@ template <typename T>
 void measure_std_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CompareLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
-    std::sort(tmp.begin(), tmp.end());
+    std::sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "std_sort", tmp.size(), td.total_microseconds());
+    log(data_traits, "std_sort", tmp.size(), td.total_microseconds(), less.count());
     print<T>(data, tmp, "std_sort" + data_traits + ' ');
 }
 
@@ -111,11 +115,12 @@ template <typename T>
 void measure_std_partial_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CompareLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
-    std::partial_sort(tmp.begin(), tmp.end(), tmp.end());
+    std::partial_sort(tmp.begin(), tmp.end(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "std_partial_sort", tmp.size(), td.total_microseconds());
+    log(data_traits, "std_partial_sort", tmp.size(), td.total_microseconds(), less.count());
     print<T>(data, tmp, "std_partial_sort" + data_traits + ' ');
 }
 
@@ -123,11 +128,12 @@ template <typename T>
 void measure_std_stable_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CompareLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
-    std::stable_sort(tmp.begin(), tmp.end());
+    std::stable_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "std_stable_sort", tmp.size(), td.total_microseconds());
+    log(data_traits, "std_stable_sort", tmp.size(), td.total_microseconds(), less.count());
     print<T>(data, tmp, "std_stable_sort" + data_traits + ' ');
 }
 
