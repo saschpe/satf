@@ -76,19 +76,6 @@ void measure_std_sort(const vector<T> &data, const string &data_traits = "")
 }
 
 template <typename T>
-void measure_std_partial_sort(const vector<T> &data, const string &data_traits = "")
-{
-    vector<T> tmp = data;   // Work on a copy to not destroy original content
-    CountLess<T> less;
-
-    posix_time::ptime start = posix_time::microsec_clock::local_time();
-    std::partial_sort(tmp.begin(), tmp.end(), tmp.end(), less);
-    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "std_partial_sort", tmp.size(), td.total_microseconds(), less.count());
-    //print_vector<T>(data, tmp, "std_partial_sort" + data_traits + ' ');
-}
-
-template <typename T>
 void measure_std_stable_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
@@ -164,7 +151,6 @@ int main(int argc, char *argv[])
             tp.schedule(bind(measure_heap_sort<int>, data[j], data_names[j]));
             //tp.schedule(bind(measure_quick_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_sort<int>, data[j], data_names[j]));
-            tp.schedule(bind(measure_std_partial_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_stable_sort<int>, data[j], data_names[j]));
         }
     }
