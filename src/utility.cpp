@@ -27,9 +27,9 @@
 
 static boost::filesystem::path g_log_dir;
 
-bool log_init(const std::string &dir)
+bool log_init(const std::string &log_dir)
 {
-    g_log_dir = boost::filesystem::complete(dir, boost::filesystem::current_path());
+    g_log_dir = boost::filesystem::complete(log_dir, boost::filesystem::current_path());
     boost::filesystem::create_directory(g_log_dir);
     std::string now = boost::lexical_cast<std::string>(boost::posix_time::second_clock::local_time());
     boost::replace_all(now, " ", "_");
@@ -44,7 +44,7 @@ bool log_init(const std::string &dir)
     return true;
 }
 
-void log(const std::string &data_traits, const std::string &name, int size, unsigned int time_msecs, unsigned int comparison_count)
+void log(const std::string &name, const std::string &data_traits, int size, unsigned int time_msecs, unsigned int comparison_count)
 {
     static boost::mutex log_mutex;
 

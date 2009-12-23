@@ -45,7 +45,7 @@ void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     heap_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "heap_sort", tmp.size(), td.total_microseconds(), less.count());
+    log("heap_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
     //print_vector<T>(data, tmp, "heap_sort " + data_traits + ' ');
 }
 
@@ -58,7 +58,7 @@ void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     quick_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "recursive_quick_sort", tmp.size(), td.total_microseconds(), less.count());
+    log("recursive_quick_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
     //print_vector<T>(data, tmp, "recursive_quick_sort" + data_traits + ' ');
 }
 
@@ -71,8 +71,7 @@ void measure_std_sort(const vector<T> &data, const string &data_traits = "")
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "std_sort", tmp.size(), td.total_microseconds(), less.count());
-    //print_vector<T>(data, tmp, "std_sort" + data_traits + ' ');
+    log("std_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
 }
 
 template <typename T>
@@ -84,8 +83,7 @@ void measure_std_stable_sort(const vector<T> &data, const string &data_traits = 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
     std::stable_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log(data_traits, "std_stable_sort", tmp.size(), td.total_microseconds(), less.count());
-    //print_vector<T>(data, tmp, "std_stable_sort" + data_traits + ' ');
+    log("std_stable_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
 }
 
 int main(int argc, char *argv[])

@@ -26,13 +26,13 @@
 /**
  *
  */
-bool log_init(const std::string &dir);
+bool log_init(const std::string &log_dir);
 
 /**
  *
  * This method is thread-safe and reentrant.
  */
-void log(const std::string &data_traits, const std::string &name, int size, unsigned int time_msecs, unsigned int comparison_count = -1);
+void log(const std::string &name, const std::string &data_traits, int size, unsigned int time_msecs, unsigned int comparison_count = -1);
 
 /**
  *
