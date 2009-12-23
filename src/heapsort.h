@@ -28,7 +28,7 @@ void heap_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less les
 }
 
 template <class InputIterator, class OutputIterator, class Less>
-OutputIterator heap_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less )
+OutputIterator heap_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less)
 {
     typedef typename std::iterator_traits<OutputIterator>::value_type value_type;
     std::vector<value_type> tmp(first, beyond);
