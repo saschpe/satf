@@ -39,4 +39,3 @@ OutputIterator heap_sort(InputIterator first, InputIterator beyond, OutputIterat
 }
 
 #endif
-

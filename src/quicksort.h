@@ -34,7 +34,7 @@ void quick_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less le
 }
 
 template <class InputIterator, class OutputIterator, class Less>
-OutputIterator quick_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less )
+OutputIterator quick_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less)
 {
     typedef typename std::iterator_traits<OutputIterator>::value_type value_type;
     std::vector<value_type> tmp(first, beyond);
