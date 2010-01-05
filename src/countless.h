@@ -17,24 +17,25 @@
     02110-1301, USA.
 */
 
-#ifndef HEAPSORT_H
-#define HEAPSORT_H
+#ifndef COUNTLESS_H
+#define COUNTLESS_H
 
-template <class RandomAccessIterator, class Less>
-void heap_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
+template <typename T>
+class CountLess
 {
-    std::make_heap(first, beyond, less);
-    std::sort_heap(first, beyond, less);
-}
+public:
+    CountLess() : m_count(0) {};
 
-template <class InputIterator, class OutputIterator, class Less>
-OutputIterator heap_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less)
-{
-    typedef typename std::iterator_traits<OutputIterator>::value_type value_type;
-    std::vector<value_type> tmp(first, beyond);
-    heap_sort(tmp.begin(), tmp.end(), less);
-    std::copy(tmp.begin(), tmp.end(), result);
-    return result;
-}
+    void reset() { m_count = 0; }
+    unsigned int count() const { return m_count; }
 
-#endif
+    bool operator()(T a, T b) {
+        m_count++;
+        return a < b;
+    }
+
+private:
+    unsigned int m_count;
+};
+
+#endif // COUNTLESS_H

@@ -17,24 +17,28 @@
     02110-1301, USA.
 */
 
-#ifndef HEAPSORT_H
-#define HEAPSORT_H
+#ifndef UTILITY_H
+#define UTILITY_H
 
-template <class RandomAccessIterator, class Less>
-void heap_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
-{
-    std::make_heap(first, beyond, less);
-    std::sort_heap(first, beyond, less);
-}
+#include <iostream>
+#include <vector>
 
-template <class InputIterator, class OutputIterator, class Less>
-OutputIterator heap_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less)
-{
-    typedef typename std::iterator_traits<OutputIterator>::value_type value_type;
-    std::vector<value_type> tmp(first, beyond);
-    heap_sort(tmp.begin(), tmp.end(), less);
-    std::copy(tmp.begin(), tmp.end(), result);
-    return result;
-}
+/**
+ *
+ */
+bool log_init(const std::string &log_dir);
 
-#endif
+/**
+ *
+ * This method is thread-safe and reentrant.
+ */
+void log(const std::string &name, const std::string &data_traits, int size, unsigned int time_msecs, unsigned int comparison_count = -1);
+
+/**
+ *
+ * This method is thread-safe and reentrant.
+ */
+template <typename T>
+void print_vector(const std::vector<T> &before, const std::vector<T> &after, const std::string &line_prefix = "");
+
+#endif // UTILITY_H
