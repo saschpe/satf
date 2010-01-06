@@ -34,8 +34,7 @@ OutputIterator heap_sort(InputIterator first, InputIterator beyond, OutputIterat
     std::vector<value_type> tmp(first, beyond);
     std::make_heap(tmp.begin(), tmp.end(), less);
     std::sort_heap(tmp.begin(), tmp.end(), less);
-    std::copy(tmp.begin(), tmp.end(), result);
-    return result;
+    return std::copy(tmp.begin(), tmp.end(), result);
 }
 
 #endif
