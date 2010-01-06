@@ -20,16 +20,6 @@
 #ifndef BUBBLEEXTSORT_H
 #define BUBBLEEXTSORT_H
 
-template <class InputIterator, class OutputIterator, class Less>
-OutputIterator bubble_ext_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less)
-{
-    typedef typename std::iterator_traits<InputIterator>::value_type type;
-    std::vector<type> values;
-    std::copy(first, beyond, back_inserter(values));
-    bubble_ext_sort(values.begin(), values.end(), less);
-    return std::copy(values.begin(), values.end(), result);
-}
-
 template <class RandomAccessIterator, class Less>
 void bubble_ext_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less less)
 {
@@ -63,6 +53,16 @@ void bubble_ext_sort(RandomAccessIterator first, RandomAccessIterator beyond, Le
         }
         x++;
     }
+}
+
+template <class InputIterator, class OutputIterator, class Less>
+OutputIterator bubble_ext_sort(InputIterator first, InputIterator beyond, OutputIterator result, Less less)
+{
+    typedef typename std::iterator_traits<InputIterator>::value_type type;
+    std::vector<type> values;
+    std::copy(first, beyond, back_inserter(values));
+    bubble_ext_sort(values.begin(), values.end(), less);
+    return std::copy(values.begin(), values.end(), result);
 }
 
 #endif
