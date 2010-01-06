@@ -45,8 +45,7 @@ OutputIterator quick_sort(InputIterator first, InputIterator beyond, OutputItera
         quick_sort(begin, middle, less);
         quick_sort(std::max(begin + 1, middle), end, less);
     }
-    std::copy(tmp.begin(), tmp.end(), result);
-    return result;
+    return std::copy(tmp.begin(), tmp.end(), result);
 }
 
 #endif
