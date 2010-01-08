@@ -10,11 +10,14 @@ This little 'framework' allows to perform runtime measurement of spatial sort al
 
 These algorithms are currently measured:
 
- - heap_sort
- - quick_sort (recursive)
- - std::partial_sort (based on heap_sort)
- - std::stable_sort (based on merge_sort)
  - std::sort (based on quicksort)
+ - std::stable_sort (based on merge_sort)
+ - heap_sort
+ - shell_sort (CP)
+ - cook_kim_sort (VS)
+ - splay_sort (SL)
+ - mel_sort (SS)
+ - cook_xx_sort (MW)
 
 
 INSTALLATION
@@ -42,4 +45,3 @@ TODO
 ----
 
  - Add memory profiling ((m|re)alloc/free counts, etc.). Needs a proper instrumentation tool or library
- - Add more sorting algorithms
