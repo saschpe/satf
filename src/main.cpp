@@ -18,9 +18,13 @@
 */
 
 #include "boost/threadpool.hpp"
+#include "cookkimsort.h"
+#include "cookxxxsort.h"
 #include "countless.h"
 #include "heapsort.h"
-#include "quicksort.h"
+#include "melsort.h"
+#include "shellsort.h"
+#include "splaysort.h"
 #include "utility.h"
 
 #include <boost/bind.hpp>
@@ -35,32 +39,6 @@
 
 using namespace boost;
 using namespace std;
-
-template <typename T>
-void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
-{
-    vector<T> tmp = data;   // Work on a copy to not destroy original content
-    CountLess<T> less;
-
-    posix_time::ptime start = posix_time::microsec_clock::local_time();
-    heap_sort(tmp.begin(), tmp.end(), less);
-    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log("heap_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
-    //print_vector<T>(data, tmp, "heap_sort " + data_traits + ' ');
-}
-
-template <typename T>
-void measure_quick_sort(const vector<T> &data, const string &data_traits = "")
-{
-    vector<T> tmp = data;   // Work on a copy to not destroy original content
-    CountLess<T> less;
-
-    posix_time::ptime start = posix_time::microsec_clock::local_time();
-    quick_sort(tmp.begin(), tmp.end(), less);
-    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log("recursive_quick_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
-    //print_vector<T>(data, tmp, "recursive_quick_sort" + data_traits + ' ');
-}
 
 template <typename T>
 void measure_std_sort(const vector<T> &data, const string &data_traits = "")
@@ -84,6 +62,78 @@ void measure_std_stable_sort(const vector<T> &data, const string &data_traits = 
     std::stable_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
     log("std_stable_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
+}
+
+template <typename T>
+void measure_heap_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CountLess<T> less;
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    heap_sort(tmp.begin(), tmp.end(), less);
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+    log("heap_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
+}
+
+template <typename T>
+void measure_shell_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CountLess<T> less;
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    shell_sort(tmp.begin(), tmp.end(), less);
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+    log("shell_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
+}
+
+template <typename T>
+void measure_cook_kim_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CountLess<T> less;
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    cook_kim_sort(tmp.begin(), tmp.end(), less);
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+    log("cook_kim_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
+}
+
+template <typename T>
+void measure_splay_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CountLess<T> less;
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    splay_sort(tmp.begin(), tmp.end(), less);
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+    log("splay_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
+}
+
+template <typename T>
+void measure_mel_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CountLess<T> less;
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    mel_sort(tmp.begin(), tmp.end(), less);
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+    log("mel_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
+}
+
+template <typename T>
+void measure_cook_xxx_sort(const vector<T> &data, const string &data_traits = "")
+{
+    vector<T> tmp = data;   // Work on a copy to not destroy original content
+    CountLess<T> less;
+
+    posix_time::ptime start = posix_time::microsec_clock::local_time();
+    cook_xxx_sort(tmp.begin(), tmp.end(), less);
+    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
+    log("cook_xxx_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
 }
 
 int main(int argc, char *argv[])
@@ -146,10 +196,14 @@ int main(int argc, char *argv[])
 
         // Apply every algorithm to all data types
         for (unsigned int j = 0; j < 4; j++) {
-            tp.schedule(bind(measure_heap_sort<int>, data[j], data_names[j]));
-            //tp.schedule(bind(measure_quick_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_stable_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_heap_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_shell_sort<int> data[j], data_names[j]));
+            tp.schedule(bind(measure_cook_kim_sort<int> data[j], data_names[j]));
+            tp.schedule(bind(measure_splay_sort<int> data[j], data_names[j]));
+            tp.schedule(bind(measure_mel_sort<int> data[j], data_names[j]));
+            tp.schedule(bind(measure_cook_xxx_sort<int> data[j], data_names[j]));
         }
     }
     return 0;
