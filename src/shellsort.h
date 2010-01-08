@@ -1,8 +1,5 @@
-/**********************************************************
-*                                                         *
-*                   ShellSort                             *
-*                                                         *
-**********************************************************/
+#ifndef SHELLSORT_H
+#define SHELLSORT_H
 
 #include <vector>
 
@@ -85,3 +82,5 @@ void shell_sort(RandomAccessIterator first, RandomAccessIterator beyond, Less le
 {
     shell_sort(first, beyond, first, less);
 }
+
+#endif // SHELLSORT_H

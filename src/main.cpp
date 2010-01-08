@@ -199,11 +199,11 @@ int main(int argc, char *argv[])
             tp.schedule(bind(measure_std_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_std_stable_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_heap_sort<int>, data[j], data_names[j]));
-            tp.schedule(bind(measure_shell_sort<int> data[j], data_names[j]));
-            tp.schedule(bind(measure_cook_kim_sort<int> data[j], data_names[j]));
-            tp.schedule(bind(measure_splay_sort<int> data[j], data_names[j]));
-            tp.schedule(bind(measure_mel_sort<int> data[j], data_names[j]));
-            tp.schedule(bind(measure_cook_xxx_sort<int> data[j], data_names[j]));
+            tp.schedule(bind(measure_shell_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_cook_kim_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_splay_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_mel_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_cook_xxx_sort<int>, data[j], data_names[j]));
         }
     }
     return 0;
