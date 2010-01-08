@@ -33,8 +33,7 @@ OutputIterator heap_sort(InputIterator first, InputIterator beyond, OutputIterat
     typedef typename std::iterator_traits<OutputIterator>::value_type value_type;
     std::vector<value_type> tmp(first, beyond);
     heap_sort(tmp.begin(), tmp.end(), less);
-    std::copy(tmp.begin(), tmp.end(), result);
-    return result;
+    return std::copy(tmp.begin(), tmp.end(), result);
 }
 
 #endif
