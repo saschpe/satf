@@ -20,22 +20,45 @@
 #ifndef COUNTLESS_H
 #define COUNTLESS_H
 
+#include <boost/thread.hpp>
+
+/**
+ * This class is a custom comparator and uses an ugly hack to overcome a
+ * design-error in the STL. Algorithms like std::sort and std::stable_sort
+ * take a Compare object by-value, which is useless for us if we want to
+ * count the calls to CountLess::operator()(). Therefore we make the counting
+ * variable a thread-local static so that we have at least a sane value.
+ *
+ * Note that the counter is resetted once CountLess::count() is called, so
+ * you can retrieve the value only once.
+ */
 template <typename T>
 class CountLess
 {
 public:
-    CountLess() : m_count(0) {};
+    CountLess() {
+        if (!s_count.get()) {
+            s_count.reset(new unsigned int(0));
+        }
+    }
 
-    void reset() { m_count = 0; }
-    unsigned int count() const { return m_count; }
+    static unsigned int count() {
+        unsigned int ret = *s_count;
+        *s_count = 0;
+        return ret;
+    }
 
     bool operator()(T a, T b) {
-        m_count++;
+        (*s_count)++;
         return a < b;
     }
 
 private:
-    unsigned int m_count;
+    static boost::thread_specific_ptr<unsigned int> s_count;
 };
+
+// Don't forget to allocate physical space in the binary...
+template <typename T>
+boost::thread_specific_ptr<unsigned int> CountLess<T>::s_count;
 
 #endif // COUNTLESS_H
