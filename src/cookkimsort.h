@@ -9,8 +9,7 @@ OutputIterator cook_kim_sort(InputIterator first, InputIterator beyond, OutputIt
 {
     typedef typename std::iterator_traits<InputIterator>::value_type T;
 
-    std::vector<T> xu;
-    std::vector<T> xo;
+    std::vector<T> xu, xo;
 
     while (first != beyond) {
         if (xu.empty()) {
@@ -28,7 +27,7 @@ OutputIterator cook_kim_sort(InputIterator first, InputIterator beyond, OutputIt
     if (xo.size() > 1) {
         std::sort(xo.begin(), xo.end(), less);
     }
-    return std::merge(xu.begin(), xu.end(), xo.begin(), xo.end (), result);
+    return std::merge(xu.begin(), xu.end(), xo.begin(), xo.end(), result);
 }
 
 template <class RandomAccessIterator, class Less>
