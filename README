@@ -38,7 +38,7 @@ Or simply run 'satf.sh' or peek inside for more detail.
 LICENSE
 -------
 
-All sources are licensed under the terms of the GNU General Public License (version 2 or later), except the sources found under 'src/boost'. Those have their own respective license and authors.
+All sources are licensed under the terms of the GNU General Public License (version 2 or later), except the sources found under 'src/boost' and where noted otherwise. Those have their own respective license and authors.
 
 
 TODO
