@@ -16,7 +16,6 @@ These algorithms are currently measured:
  - shell_sort (CP)
  - cook_kim_sort (VS)
  - splay_sort (SL)
- - mel_sort (SS)
  - cook_a_meal_sort (MW)
 
 

@@ -22,7 +22,6 @@
 #include "cookamealsort.h"
 #include "countless.h"
 #include "heapsort.h"
-#include "melsort.h"
 #include "shellsort.h"
 #include "splaysort.h"
 #include "utility.h"
@@ -113,18 +112,6 @@ void measure_splay_sort(const vector<T> &data, const string &data_traits = "")
 }
 
 template <typename T>
-void measure_mel_sort(const vector<T> &data, const string &data_traits = "")
-{
-    vector<T> tmp = data;   // Work on a copy to not destroy original content
-    CountLess<T> less;
-
-    posix_time::ptime start = posix_time::microsec_clock::local_time();
-    mel_sort(tmp.begin(), tmp.end(), less);
-    posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log("mel_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
-}
-
-template <typename T>
 void measure_cook_a_meal_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
@@ -202,7 +189,6 @@ int main(int argc, char *argv[])
             tp.schedule(bind(measure_shell_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_cook_kim_sort<int>, data[j], data_names[j]));
             //tp.schedule(bind(measure_splay_sort<int>, data[j], data_names[j]));
-            tp.schedule(bind(measure_mel_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_cook_a_meal_sort<int>, data[j], data_names[j]));
         }
     }
