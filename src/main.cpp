@@ -19,7 +19,7 @@
 
 #include "boost/threadpool.hpp"
 #include "cookkimsort.h"
-#include "cookxxxsort.h"
+#include "cookamealsort.h"
 #include "countless.h"
 #include "heapsort.h"
 #include "melsort.h"
@@ -125,15 +125,15 @@ void measure_mel_sort(const vector<T> &data, const string &data_traits = "")
 }
 
 template <typename T>
-void measure_cook_xxx_sort(const vector<T> &data, const string &data_traits = "")
+void measure_cook_a_meal_sort(const vector<T> &data, const string &data_traits = "")
 {
     vector<T> tmp = data;   // Work on a copy to not destroy original content
     CountLess<T> less;
 
     posix_time::ptime start = posix_time::microsec_clock::local_time();
-    cook_xxx_sort(tmp.begin(), tmp.end(), less);
+    cook_a_meal_sort(tmp.begin(), tmp.end(), less);
     posix_time::time_duration td = posix_time::microsec_clock::local_time() - start;
-    log("cook_xxx_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
+    log("cook_a_meal_sort", data_traits, tmp.size(), td.total_microseconds(), less.count());
 }
 
 int main(int argc, char *argv[])
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
             tp.schedule(bind(measure_cook_kim_sort<int>, data[j], data_names[j]));
             //tp.schedule(bind(measure_splay_sort<int>, data[j], data_names[j]));
             tp.schedule(bind(measure_mel_sort<int>, data[j], data_names[j]));
-            tp.schedule(bind(measure_cook_xxx_sort<int>, data[j], data_names[j]));
+            tp.schedule(bind(measure_cook_a_meal_sort<int>, data[j], data_names[j]));
         }
     }
     return 0;
