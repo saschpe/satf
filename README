@@ -17,7 +17,7 @@ These algorithms are currently measured:
  - cook_kim_sort (VS)
  - splay_sort (SL)
  - mel_sort (SS)
- - cook_xx_sort (MW)
+ - cook_a_meal_sort (MW)
 
 
 INSTALLATION
