@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     desc.add_options()
         ("min", program_options::value<unsigned int>(&min_size)->default_value(1), "set minimum data size")
         ("max", program_options::value<unsigned int>(&max_size)->default_value(1000), "set maximum data size")
-        ("theads", program_options::value<unsigned int>(&thread_count)->default_value(thread::hardware_concurrency()), "set worker thead count")
+        ("threads", program_options::value<unsigned int>(&thread_count)->default_value(thread::hardware_concurrency()), "set worker thead count")
         ("help", "display this help and exit");
     program_options::variables_map vm;
     program_options::store(program_options::parse_command_line(argc, argv, desc), vm);
