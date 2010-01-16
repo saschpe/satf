@@ -60,6 +60,7 @@ build/${BINARY} --min=${MIN_SIZE} --max=${MAX_SIZE}
 LAST_LOG=`ls $LOG_DIR | tail -n1`
 LAST_LOG_DIR=`echo $LOG_DIR/$LAST_LOG`
 OVERALL_MAX_TIME=0
+OVERALL_MAX_COMPARISONS=0
 echo "Sorting log files in \"$LAST_LOG_DIR\" in arithmetical order..."
 for DIR in `ls $LAST_LOG_DIR`; do
     for FILE in `ls $LAST_LOG_DIR/$DIR`; do
@@ -71,19 +72,28 @@ for DIR in `ls $LAST_LOG_DIR`; do
         if [ $MAX_TIME -gt $OVERALL_MAX_TIME ]; then
             OVERALL_MAX_TIME=$MAX_TIME
         fi
+        MAX_COMPARISONS=`tail -n1 $LAST_LOG_DIR/$DIR/$FILE | awk '{print $3}'`
+        if [ $MAX_COMPARISONS -gt $OVERALL_MAX_COMPARISONS ]; then
+            OVERALL_MAX_COMPARISONS=$MAX_COMPARISONS
+        fi
     done
 done
 if [ $OVERALL_MAX_TIME -eq 0 ]; then
     OVERALL_MAX_TIME=1 # Make gnuplot happy in corner-cases
 fi
-echo "Overall max computation time was $OVERALL_MAX_TIME millisecond"
+if [ $OVERALL_MAX_COMPARISONS -eq 0 ]; then
+    OVERALL_MAX_COMPARISONS=1 # Make gnuplot happy in corner-cases
+fi
+echo "Overall max computation time was $OVERALL_MAX_TIME ms."
+echo "Overall max comparisons was $OVERALL_MAX_COMPARISONS."
 
 # Generate function plots for each log file in LAST_LOG_DIR and
 # output into distinct files
 LAST_PLOT_DIR=`echo $PLOT_DIR/$LAST_LOG`
 UNAME=`uname -a`
 echo "Generating plots in \"$LAST_PLOT_DIR\"..."
-ALL_IN_ONE_PLOT_LINE=""
+ALL_IN_ONE_PLOT_LINE_TIME=""
+ALL_IN_ONE_PLOT_LINE_COMPARISONS=""
 for DIR in `ls $LAST_LOG_DIR`; do
     mkdir -p $LAST_PLOT_DIR/$DIR
     for FILE in `ls $LAST_LOG_DIR/$DIR`; do
@@ -95,22 +105,27 @@ set xlabel "data size [number of elements]"
 set xrange [$MIN_SIZE:$MAX_SIZE]
 set ylabel "used time [milliseconds]"
 set yrange [0:$OVERALL_MAX_TIME]
+set y2label "comparisons [number of comparisons]"
+set y2range [0:$OVERALL_MAX_COMPARISONS]
 set grid
 set pointsize 0.2
 set key top left
 set terminal png small font
 set title "algorithm: $FILE $DIR\n$UNAME"
 set output '$LAST_PLOT_DIR/$DIR/$FILE.png'
-plot '$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title "$FILE" with lines
+plot '$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title "$FILE time" axes x1y1 with lines, \
+     '$LAST_LOG_DIR/$DIR/$FILE' using 1:3 title "$FILE comparisons" axes x1y2 with lines
 quit
 EOF`
 
         # Build up the input for gnuplot 'plot' command to use for the combined plot
-        ALL_IN_ONE_PLOT_LINE+=`echo -e "'$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title \"$FILE\" with lines, "`
+        ALL_IN_ONE_PLOT_LINE_TIME+=`echo -e "'$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title \"$FILE\" with lines, "`
+        ALL_IN_ONE_PLOT_LINE_COMPARISONS+=`echo -e "'$LAST_LOG_DIR/$DIR/$FILE' using 1:3 title \"$FILE\" with lines, "`
     done
 
     # Finally generate a function plot with all algorithms combined and remove the trailing ', '
-    ALL_IN_ONE_PLOT_LINE=`echo ${ALL_IN_ONE_PLOT_LINE/%, /}`
+    ALL_IN_ONE_PLOT_LINE_TIME=`echo ${ALL_IN_ONE_PLOT_LINE_TIME/%, /}`
+    ALL_IN_ONE_PLOT_LINE_COMPARISONS=`echo ${ALL_IN_ONE_PLOT_LINE_COMPARISONS/%, /}`
 
 # Using no indent is needed here to avoid some stupid complaints
 # from bash about here-documents. Zsh would be better, as always.
@@ -123,9 +138,23 @@ set grid
 set pointsize 0.2
 set key top left
 set terminal png small font
-set title "all algorithms: $DIR\n$UNAME"
+set title "time for all algorithms: $DIR\n$UNAME"
 set output '$LAST_PLOT_DIR/$DIR/all-algortihms-time-used.png'
-plot $ALL_IN_ONE_PLOT_LINE
+plot $ALL_IN_ONE_PLOT_LINE_TIME
+quit
+EOF`
+`gnuplot << EOF 2>/dev/null
+set xlabel "data size [number of elements]"
+set xrange [$MIN_SIZE:$MAX_SIZE]
+set ylabel "comparisons [number of comparisons]"
+set yrange [0:$OVERALL_MAX_COMPARISONS]
+set grid
+set pointsize 0.2
+set key top left
+set terminal png small font
+set title "comparisons for all algorithms: $DIR\n$UNAME"
+set output '$LAST_PLOT_DIR/$DIR/all-algortihms-comparisons.png'
+plot $ALL_IN_ONE_PLOT_LINE_COMPARISONS
 quit
 EOF`
 
