@@ -87,38 +87,46 @@ ALL_IN_ONE_PLOT_LINE=""
 for DIR in `ls $LAST_LOG_DIR`; do
     mkdir -p $LAST_PLOT_DIR/$DIR
     for FILE in `ls $LAST_LOG_DIR/$DIR`; do
-        `gnuplot << EOF
-            set xlabel "data size [number of elements]"
-            set xrange [$MIN_SIZE:$MAX_SIZE]
-            set ylabel "used time [milliseconds]"
-            set yrange [0:$OVERALL_MAX_TIME]
-            set grid
-            set pointsize 0.2
-            set key top left
-            set terminal png font "arial" 8
-            set title "algorithm: $FILE $DIR\n$UNAME"
-            set output '$LAST_PLOT_DIR/$DIR/$FILE.png'
-            plot '$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title "$FILE" with lines
-            quit
-            EOF`
+
+# Using no indent is needed here to avoid some stupid complaints
+# from bash about here-documents. Zsh would be better, as always.
+`gnuplot << EOF
+set xlabel "data size [number of elements]"
+set xrange [$MIN_SIZE:$MAX_SIZE]
+set ylabel "used time [milliseconds]"
+set yrange [0:$OVERALL_MAX_TIME]
+set grid
+set pointsize 0.2
+set key top left
+set terminal png small font
+set title "algorithm: $FILE $DIR\n$UNAME"
+set output '$LAST_PLOT_DIR/$DIR/$FILE.png'
+plot '$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title "$FILE" with lines
+quit
+EOF`
+
         # Build up the input for gnuplot 'plot' command to use for the combined plot
         ALL_IN_ONE_PLOT_LINE+=`echo -e "'$LAST_LOG_DIR/$DIR/$FILE' using 1:2 title \"$FILE\" with lines, "`
     done
 
     # Finally generate a function plot with all algorithms combined and remove the trailing ', '
     ALL_IN_ONE_PLOT_LINE=`echo ${ALL_IN_ONE_PLOT_LINE/%, /}`
-    `gnuplot << EOF
-        set xlabel "data size [number of elements]"
-        set xrange [$MIN_SIZE:$MAX_SIZE]
-        set ylabel "used time [milliseconds]"
-        set yrange [0:$OVERALL_MAX_TIME]
-        set grid
-        set pointsize 0.2
-        set key top left
-        set terminal png font "arial" 8
-        set title "all algorithms: $DIR\n$UNAME"
-        set output '$LAST_PLOT_DIR/$DIR/all.png'
-        plot $ALL_IN_ONE_PLOT_LINE
-        quit
-        EOF`
+
+# Using no indent is needed here to avoid some stupid complaints
+# from bash about here-documents. Zsh would be better, as always.
+`gnuplot << EOF
+set xlabel "data size [number of elements]"
+set xrange [$MIN_SIZE:$MAX_SIZE]
+set ylabel "used time [milliseconds]"
+set yrange [0:$OVERALL_MAX_TIME]
+set grid
+set pointsize 0.2
+set key top left
+set terminal png small font
+set title "all algorithms: $DIR\n$UNAME"
+set output '$LAST_PLOT_DIR/$DIR/all.png'
+plot $ALL_IN_ONE_PLOT_LINE
+quit
+EOF`
+
 done
