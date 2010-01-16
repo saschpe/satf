@@ -18,7 +18,7 @@
 #
 
 MIN_SIZE=1
-MAX_SIZE=1000
+MAX_SIZE=10000
 CMAKE=`which cmake 2>/dev/null`
 GNUPLOT=`which gnuplot 2>/dev/null`
 BINARY=satf

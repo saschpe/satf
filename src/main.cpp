@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     program_options::options_description desc("Allowed options");
     desc.add_options()
         ("min", program_options::value<unsigned int>(&min_size)->default_value(1), "set minimum data size")
-        ("max", program_options::value<unsigned int>(&max_size)->default_value(1000), "set maximum data size")
+        ("max", program_options::value<unsigned int>(&max_size)->default_value(10000), "set maximum data size")
         ("threads", program_options::value<unsigned int>(&thread_count)->default_value(thread::hardware_concurrency()), "set worker thead count")
         ("help", "display this help and exit");
     program_options::variables_map vm;
