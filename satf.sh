@@ -114,7 +114,7 @@ EOF`
 
 # Using no indent is needed here to avoid some stupid complaints
 # from bash about here-documents. Zsh would be better, as always.
-`gnuplot << EOF
+`gnuplot << EOF 2>/dev/null
 set xlabel "data size [number of elements]"
 set xrange [$MIN_SIZE:$MAX_SIZE]
 set ylabel "used time [milliseconds]"
@@ -124,7 +124,7 @@ set pointsize 0.2
 set key top left
 set terminal png small font
 set title "all algorithms: $DIR\n$UNAME"
-set output '$LAST_PLOT_DIR/$DIR/all.png'
+set output '$LAST_PLOT_DIR/$DIR/all-algortihms-time-used.png'
 plot $ALL_IN_ONE_PLOT_LINE
 quit
 EOF`
