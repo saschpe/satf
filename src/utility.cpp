@@ -29,11 +29,11 @@ static boost::filesystem::path g_log_dir;
 
 bool log_init(const std::string &log_dir)
 {
-    g_log_dir = boost::filesystem::complete(log_dir, boost::filesystem::current_path());
+    g_log_dir = boost::filesystem::absolute(log_dir, boost::filesystem::current_path());
     boost::filesystem::create_directory(g_log_dir);
     std::string now = boost::lexical_cast<std::string>(boost::posix_time::second_clock::local_time());
     boost::replace_all(now, " ", "_");
-    g_log_dir = boost::filesystem::complete(now, g_log_dir);
+    g_log_dir = boost::filesystem::absolute(now, g_log_dir);
     boost::filesystem::create_directory(g_log_dir);
     if (!boost::filesystem::exists(g_log_dir)) {
         std::cerr << "unable to create log directory " << g_log_dir << std::endl;
@@ -49,8 +49,8 @@ void log(const std::string &name, const std::string &data_traits, int size, unsi
     static boost::mutex log_mutex;
 
     boost::lock_guard<boost::mutex> lock(log_mutex);
-    boost::filesystem::path log_dir = boost::filesystem::complete(data_traits, g_log_dir);
-    boost::filesystem::path log_file = boost::filesystem::complete(name, log_dir);
+    boost::filesystem::path log_dir = boost::filesystem::absolute(data_traits, g_log_dir);
+    boost::filesystem::path log_file = boost::filesystem::absolute(name, log_dir);
     boost::filesystem::create_directory(log_dir);
     boost::filesystem::ofstream ofs(log_file, std::ios_base::app | std::ios_base::out);
     ofs << size << ' ' << time_msecs << ' ' << comparison_count << std::endl;
